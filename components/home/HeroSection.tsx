@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -7,12 +5,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAndroid, faApple } from '@fortawesome/free-brands-svg-icons';
 import { faImage } from '@fortawesome/free-solid-svg-icons';
 import { ArrowRight } from 'lucide-react';
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, FileRejection } from 'react-dropzone';
 
 const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState<string | null>(null);
   const [error, setError] = useState('');
 
   // Mouse move effect for background grid
@@ -46,7 +44,7 @@ const HeroSection = () => {
   }, []);
 
   // Dropzone logic
-  const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
+  const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
     setError('');
     if (rejectedFiles.length > 0) {
       setError('Please upload a valid image file (jpg, jpeg, png).');
