@@ -54,7 +54,7 @@ const item = {
 
 const FeatureSection = () => {
   return (
-    <section className="py-20 px-6 md:px-8 relative overflow-hidden">
+    <section className="min-h-[50vh] py-8 px-6 md:px-8 relative overflow-hidden flex items-center justify-center">
       {/* Background gradient */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-[500px] bg-blue-900/20 blur-[120px] rounded-full -z-10"></div>
 
