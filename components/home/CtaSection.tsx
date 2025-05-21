@@ -16,18 +16,6 @@ const CtaSection = () => {
         viewport={{ once: true }}
         className="text-center space-y-6 max-w-3xl mx-auto"
       >
-        <h2 className="text-3xl md:text-4xl font-bold text-white">
-          Get Started Today
-        </h2>
-        <p className="text-lg text-muted-foreground">
-          Scan your product labels and discover the healthiness of your food with our easy-to-use app.
-        </p>
-        <Button
-          size="lg"
-          className="bg-blue-500 hover:bg-blue-600 text-white"
-        >
-          Try Now
-        </Button>
       </motion.div>
     </section>
   );
