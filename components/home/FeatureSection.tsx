@@ -63,10 +63,10 @@ const FeatureSection = () => {
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, margin: '-100px' }}
-        className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+        className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center"
       >
         {features.map((feature, index) => (
-          <motion.div key={index} variants={item}>
+          <motion.div key={index} variants={item} className="w-full max-w-xs">
             <FeatureCard
               icon={feature.icon}
               title={feature.title}
@@ -95,7 +95,7 @@ const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {
         <CardTitle className="text-xl text-white">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <CardDescription className="text-muted-foreground text-sm">
+        <CardDescription className="text-muted-foreground text-sm text-justify">
           {description}
         </CardDescription>
       </CardContent>
