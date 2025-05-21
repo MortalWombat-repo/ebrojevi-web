@@ -10,12 +10,14 @@ export default function Home() {
     <div className="min-h-screen snap-y snap-mandatory overflow-y-auto">
       <main>
         <HeroSection />
-        <div className="snap-start min-h-screen">
-          <FeatureSection />
+        <div className="snap-start min-h-screen flex flex-col">
+          <div className="flex-grow">
+            <FeatureSection />
+          </div>
+          <Footer />
         </div>
         <CtaSection />
       </main>
-      <Footer />
     </div>
   );
 }
