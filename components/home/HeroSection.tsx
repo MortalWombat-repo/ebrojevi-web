@@ -78,7 +78,7 @@ const HeroSection = () => {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-[90vh] flex items-center justify-center px-6 md:px-8 overflow-hidden"
+      className="relative min-h-[100vh] flex items-center justify-center px-6 md:px-8 overflow-hidden"
     >
       {/* Animated dot grid background */}
       <div className="absolute inset-0 z-0">
