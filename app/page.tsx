@@ -3,7 +3,7 @@
 import HeroSection from '@/components/home/HeroSection';
 import FeatureSection from '@/components/home/FeatureSection';
 import CtaSection from '@/components/home/CtaSection';
-import Footer from '@/components/Footer';
+import Footer from '@/components/Footer'; // Ensure this path matches the actual location
 
 export default function Home() {
   return (
