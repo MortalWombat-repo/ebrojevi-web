@@ -17,7 +17,7 @@ const HeroSection = () => {
 
   // Mouse move effect for background grid
   useEffect(() => {
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: MouseEvent) => {
       if (!containerRef.current || !gridRef.current) return;
 
       const { left, top, width, height } =
