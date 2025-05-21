@@ -10,8 +10,8 @@ import { ArrowRight } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
 const HeroSection = () => {
-  const containerRef = useRef(null);
-  const gridRef = useRef(null);
+  const containerRef = useRef<HTMLElement>(null);
+  const gridRef = useRef<HTMLElement>(null);
   const [image, setImage] = useState(null);
   const [error, setError] = useState('');
 
