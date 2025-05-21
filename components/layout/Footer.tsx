@@ -5,8 +5,8 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-background/50 border-t border-border/20 py-8 px-6 md:px-8 min-h-[50vh] flex items-center justify-center">
-      <div className="max-w-7xl mx-auto">
+    <footer className="bg-background/50 border-t border-border/20 py-6 px-6 md:px-8 flex flex-col">
+      <div className="max-w-7xl mx-auto flex-grow">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
@@ -83,7 +83,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-border/20 mt-8 pt-8 text-center text-sm text-muted-foreground">
+        <div className="border-t border-border/20 mt-6 pt-6 text-center text-sm text-muted-foreground">
           <p>© {currentYear} Ebrojevi API. Sva prava pridržana.</p>
         </div>
       </div>
