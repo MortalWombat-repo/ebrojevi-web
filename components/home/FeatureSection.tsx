@@ -1,5 +1,3 @@
-'use client';
-
 import { motion } from 'framer-motion';
 import { Camera, BookOpen, FlaskConical, BadgeEuro } from 'lucide-react';
 import {
@@ -92,10 +90,10 @@ const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {
         <div className="transition-transform duration-300 group-hover:scale-110 mb-4 group-hover:text-blue-400 group-hover:drop-shadow-glow">
           {icon}
         </div>
-        <CardTitle className="text-xl text-white">{title}</CardTitle>
+        <CardTitle className="text-xl text-white text-center">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <CardDescription className="text-muted-foreground text-sm text-justify">
+        <CardDescription className="text-muted-foreground text-sm text-center">
           {description}
         </CardDescription>
       </CardContent>
