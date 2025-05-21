@@ -129,7 +129,7 @@ const HeroSection = () => {
           <Button
             size="lg"
             variant="outline"
-            className="border-primary/20 hover:bg-primary/10 hover:text-white w-56 flex items-center justify-center"
+            className="w-56 flex items-center justify-center text-muted-foreground/70 border-primary/20 hover:bg-primary/10 hover:text-white"
           >
             <FontAwesomeIcon icon={faAndroid} className="mr-2 h-5 w-5" />
             Android Aplikacija
@@ -139,7 +139,7 @@ const HeroSection = () => {
           <Button
             size="lg"
             variant="outline"
-            className="border-primary/20 hover:bg-primary/10 hover:text-white w-56 flex items-center justify-center"
+            className="w-56 flex items-center justify-center text-muted-foreground/70 border-primary/20 hover:bg-primary/10 hover:text-white"
           >
             <FontAwesomeIcon icon={faApple} className="mr-2 h-5 w-5" />
             iOS Aplikacija
