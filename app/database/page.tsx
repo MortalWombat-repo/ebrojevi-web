@@ -1,6 +1,4 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -14,31 +12,21 @@ interface Additive {
   [key: string]: string;
 }
 
-function DatabasePage() {
-  const [data, setData] = useState<Additive[]>([]);
-  const [expandedCodes, setExpandedCodes] = useState<string[]>([]);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch('https://ebrojevi-fast-api.onrender.com/database', { cache: 'no-store' });
-        if (!res.ok) {
-          throw new Error(`Failed to fetch additives: ${res.status}`);
-        }
-        const json = await res.json();
-        setData(json);
-      } catch (error) {
-        console.error(error);
-      }
+async function getAdditives(): Promise<Additive[]> {
+  const res = await fetch(
+    'https://ebrojevi-fast-api.onrender.com/database',
+    {
+      cache: 'no-store',
     }
-    fetchData();
-  }, []);
+  );
+  if (!res.ok) {
+    throw new Error(`Failed to fetch additives: ${res.status}`);
+  }
+  return res.json();
+}
 
-  const toggleExpanded = (code: string) => {
-    setExpandedCodes((prev) =>
-      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
-    );
-  };
+export default async function DatabasePage() {
+  const data = await getAdditives();
 
   const getBackgroundColor = (color: string) => {
     switch (color.toLowerCase()) {
@@ -52,8 +40,6 @@ function DatabasePage() {
         return 'bg-white hover:bg-gray-100 hover:shadow-[0_0_8px_2px_rgba(209,213,219,0.6)]';
     }
   };
-
-  const keys = data.length > 0 ? Object.keys(data[0]) : [];
 
   return (
     <div className="container mx-auto py-10 text-gray-800">
@@ -69,9 +55,10 @@ function DatabasePage() {
             <TableHeader>
               <TableRow>
                 <TableHead>#</TableHead>
-                {keys.map((key) => (
-                  <TableHead key={key}>{key.toUpperCase()}</TableHead>
-                ))}
+                {data.length > 0 &&
+                  Object.keys(data[0]).map((key) => (
+                    <TableHead key={key}>{key.toUpperCase()}</TableHead>
+                  ))}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -81,21 +68,8 @@ function DatabasePage() {
                   className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
                 >
                   <TableCell>{index + 1}</TableCell>
-                  {keys.map((key) => (
-                    <TableCell key={key}>
-                      {key === 'description' ? (
-                        <div
-                          onClick={() => toggleExpanded(item.code)}
-                          className="cursor-pointer"
-                        >
-                          {expandedCodes.includes(item.code) || !item[key] || item[key].length <= 20
-                            ? item[key]
-                            : `${item[key].slice(0, 20)}...`}
-                        </div>
-                      ) : (
-                        item[key]
-                      )}
-                    </TableCell>
+                  {Object.values(item).map((value, idx) => (
+                    <TableCell key={idx}>{value}</TableCell>
                   ))}
                 </TableRow>
               ))}
@@ -106,5 +80,3 @@ function DatabasePage() {
     </div>
   );
 }
-
-export default DatabasePage;
