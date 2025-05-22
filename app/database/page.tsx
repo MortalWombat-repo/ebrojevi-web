@@ -64,7 +64,7 @@ export default async function DatabasePage() {
               {data.map((item, index) => (
                 <TableRow
                   key={item.code || index}
-                  className={getBackgroundColor(item.color || '')}
+                  className={`${getBackgroundColor(item.color || '')} transition-shadow duration-200 hover:shadow-[0_0_8px_2px_rgba(59,130,246,0.6)] hover:bg-opacity-80`}
                 >
                   <TableCell>{index + 1}</TableCell>
                   {Object.values(item).map((value, idx) => (
