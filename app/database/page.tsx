@@ -1,5 +1,6 @@
-// app/database/page.tsx
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -13,22 +14,29 @@ interface Additive {
   [key: string]: string;
 }
 
-async function getAdditives(): Promise<Additive[]> {
-  const res = await fetch(
-    'https://ebrojevi-fast-api.onrender.com/database',
-    {
-      // never fetch this from the browser
-      cache: 'no-store'
-    }
-  );
-  if (!res.ok) {
-    throw new Error(`Failed to fetch additives: ${res.status}`);
-  }
-  return res.json();
-}
+export default function DatabasePage() {
+  const [data, setData] = useState<Additive[]>([]);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
-export default async function DatabasePage() {
-  const data = await getAdditives();
+  useEffect(() => {
+    async function fetchAdditives() {
+      try {
+        const res = await fetch(
+          'https://ebrojevi-fast-api.onrender.com/database',
+          { cache: 'no-store' }
+        );
+        if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+        const json: Additive[] = await res.json();
+        setData(json);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAdditives();
+  }, []);
 
   const getBackgroundColor = (color: string) => {
     switch (color.toLowerCase()) {
@@ -43,6 +51,13 @@ export default async function DatabasePage() {
     }
   };
 
+  const truncate = (text: string) =>
+    text.length > 20 ? `${text.slice(0, 20)}...` : text;
+
+  if (loading) {
+    return <p className="text-center">Loading...</p>;
+  }
+
   return (
     <div className="container mx-auto py-10">
       <div className="flex flex-col gap-4">
@@ -54,10 +69,12 @@ export default async function DatabasePage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>#</TableHead>
+                <TableHead className="text-gray-800">#</TableHead>
                 {data.length > 0 &&
                   Object.keys(data[0]).map((key) => (
-                    <TableHead key={key}>{key.toUpperCase()}</TableHead>
+                    <TableHead key={key} className="text-gray-800">
+                      {key.toUpperCase()}
+                    </TableHead>
                   ))}
               </TableRow>
             </TableHeader>
@@ -65,11 +82,20 @@ export default async function DatabasePage() {
               {data.map((item, index) => (
                 <TableRow
                   key={item.code || index}
-                  className={getBackgroundColor(item.color || '')}
+                  className={`${getBackgroundColor(item.color || '')} cursor-pointer`}
+                  onClick={() =>
+                    setExpandedIndex(index === expandedIndex ? null : index)
+                  }
                 >
-                  <TableCell>{index + 1}</TableCell>
-                  {Object.values(item).map((value, idx) => (
-                    <TableCell key={idx}>{value}</TableCell>
+                  <TableCell className="text-gray-800">{index + 1}</TableCell>
+                  {Object.entries(item).map(([key, value], idx) => (
+                    <TableCell key={idx} className="text-gray-800">
+                      {key === 'description'
+                        ? expandedIndex === index
+                          ? value
+                          : truncate(value)
+                        : value}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))}
