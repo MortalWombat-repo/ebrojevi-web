@@ -69,13 +69,13 @@ export default async function DatabasePage() {
                 >
                   <TableCell>{index + 1}</TableCell>
                  {Object.entries(item).map(([key, value], idx) => (
-  <TableCell
-    key={idx}
-    className={key === 'description' ? 'text-left text-justify' : ''}
-  >
-    {value}
-  </TableCell>
-))}
+                  <TableCell
+                    key={idx}
+                    className={key === 'description' ? 'text-left text-justify' : ''}
+                  >
+                    {value}
+                  </TableCell>
+                ))}
                 </TableRow>
               ))}
             </TableBody>
