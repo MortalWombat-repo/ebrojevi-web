@@ -44,14 +44,14 @@ export default async function DatabasePage() {
 
     // Function to assign specific widths and centering to column headers
     const getHeaderClass = (key: string) => {
-      const baseClasses = 'text-center'; // Center all headers
+      const baseClasses = 'text-center'; // Horizontal centering for headers
       switch (key) {
         case 'code':
           return `${baseClasses} w-[100px]`;
         case 'name':
           return `${baseClasses} w-[250px]`;
         case 'description':
-          return 'max-w-[300px]'; // Description remains left-aligned for readability
+          return 'max-w-[300px]'; // Left-aligned for readability
         case 'type':
           return `${baseClasses} w-[100px]`;
         case 'adi':
@@ -61,14 +61,14 @@ export default async function DatabasePage() {
       }
     };
 
-    // Function to apply centering to table cells
+    // Function to apply vertical centering to table cells
     const getCellClass = (key: string) => {
-      const baseClasses = 'whitespace-normal p-2 align-top';
-      // Center cells for #, code, name, type, and adi
-      if (['code', 'name', 'type', 'adi'].includes(key)) {
-        return `${baseClasses} text-center`;
+      const baseClasses = 'whitespace-normal p-2';
+      // Vertically center cells for #, code, name, type, and adi using flex
+      if (['#', 'code', 'name', 'type', 'adi'].includes(key)) {
+        return `${baseClasses} flex items-center`;
       }
-      return baseClasses; // Description remains left-aligned
+      return `${baseClasses} align-top`; // Description remains top-aligned
     };
 
     // Filter out the 'color' key for table headers and cells
@@ -101,7 +101,7 @@ export default async function DatabasePage() {
                     key={item.code || index}
                     className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
                   >
-                    <TableCell className="w-[50px] whitespace-normal p-2 align-top text-center">
+                    <TableCell className={getCellClass('#')}>
                       {index + 1}
                     </TableCell>
                     {visibleColumns.map((key, idx) => (
