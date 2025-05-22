@@ -1,6 +1,4 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -14,30 +12,21 @@ interface Additive {
   [key: string]: string;
 }
 
-function DatabasePage() {
-  const [data, setData] = useState<Additive[]>([]);
-  const [expanded, setExpanded] = useState<Set<number>>(new Set());
-
-  useEffect(() => {
-    async function getAdditives() {
-      const res = await fetch(
-        'https://ebrojevi-fast-api.onrender.com/database',
-        {
-          cache: 'no-store',
-        }
-      );
-      if (!res.ok) {
-        throw new Error(`Failed to fetch additives: ${res.status}`);
-      }
-      const data = await res.json();
-      setData(data);
+async function getAdditives(): Promise<Additive[]> {
+  const res = await fetch(
+    'https://ebrojevi-fast-api.onrender.com/database',
+    {
+      cache: 'no-store',
     }
-    getAdditives();
-  }, []);
-
-  if (data.length === 0) {
-    return <div>Loading...</div>;
+  );
+  if (!res.ok) {
+    throw new Error(`Failed to fetch additives: ${res.status}`);
   }
+  return res.json();
+}
+
+export default async function DatabasePage() {
+  const data = await getAdditives();
 
   const getBackgroundColor = (color: string) => {
     switch (color.toLowerCase()) {
@@ -66,45 +55,23 @@ function DatabasePage() {
             <TableHeader>
               <TableRow>
                 <TableHead>#</TableHead>
-                {Object.keys(data[0]).map((key) => (
-                  <TableHead key={key}>{key.toUpperCase()}</TableHead>
-                ))}
+                {data.length > 0 &&
+                  Object.keys(data[0]).map((key) => (
+                    <TableHead key={key}>{key.toUpperCase()}</TableHead>
+                  ))}
               </TableRow>
             </TableHeader>
             <TableBody>
               {data.map((item, index) => (
-                <React.Fragment key={item.code || index}>
-                  <TableRow
-                    className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
-                    onClick={() => {
-                      const newExpanded = new Set(expanded);
-                      if (newExpanded.has(index)) {
-                        newExpanded.delete(index);
-                      } else {
-                        newExpanded.add(index);
-                      }
-                      setExpanded(newExpanded);
-                    }}
-                  >
-                    <TableCell>{index + 1}</TableCell>
-                    {Object.entries(item).map(([key, value]) => (
-                      <TableCell key={key}>
-                        {key === 'description'
-                          ? value.length > 20
-                            ? value.substring(0, 20) + '...'
-                            : value
-                          : value}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                  {expanded.has(index) && (
-                    <TableRow>
-                      <TableCell colSpan={1 + Object.keys(item).length}>
-                        Full Description: {item.description}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </React.Fragment>
+                <TableRow
+                  key={item.code || index}
+                  className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
+                >
+                  <TableCell>{index + 1}</TableCell>
+                  {Object.values(item).map((value, idx) => (
+                    <TableCell key={idx}>{value}</TableCell>
+                  ))}
+                </TableRow>
               ))}
             </TableBody>
           </Table>
@@ -113,5 +80,3 @@ function DatabasePage() {
     </div>
   );
 }
-
-export default DatabasePage;
