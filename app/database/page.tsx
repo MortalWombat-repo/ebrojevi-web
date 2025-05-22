@@ -1,30 +1,5 @@
-// app/api/additives/route.ts
-import { NextResponse } from 'next/server';
-
-export async function GET() {
-  try {
-    const res = await fetch('https://ebrojevi-fast-api.onrender.com/database', { cache: 'no-store' });
-    if (!res.ok) {
-      return NextResponse.json(
-        { error: `Upstream fetch failed: ${res.status}` },
-        { status: res.status }
-      );
-    }
-    const data = await res.json();
-    return NextResponse.json(data);
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Network error fetching additives' },
-      { status: 502 }
-    );
-  }
-}
-
-
 // app/database/page.tsx
-'use client';
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -38,42 +13,22 @@ interface Additive {
   [key: string]: string;
 }
 
-export default function DatabasePage() {
-  const [data, setData] = useState<Additive[]>([]);
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchAdditives() {
-      try {
-        const res = await fetch('/api/additives');
-        const contentType = res.headers.get('content-type') || '';
-        if (!res.ok) {
-          let errMsg = `Request failed: ${res.status}`;
-          if (contentType.includes('application/json')) {
-            const errJson = await res.json();
-            errMsg = errJson.error || errMsg;
-          }
-          throw new Error(errMsg);
-        }
-        let json: Additive[];
-        if (contentType.includes('application/json')) {
-          json = await res.json();
-        } else {
-          const text = await res.text();
-          throw new Error('Invalid JSON response');
-        }
-        setData(json);
-      } catch (err: any) {
-        console.error(err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+async function getAdditives(): Promise<Additive[]> {
+  const res = await fetch(
+    'https://ebrojevi-fast-api.onrender.com/database',
+    {
+      // never fetch this from the browser
+      cache: 'no-store'
     }
-    fetchAdditives();
-  }, []);
+  );
+  if (!res.ok) {
+    throw new Error(`Failed to fetch additives: ${res.status}`);
+  }
+  return res.json();
+}
+
+export default async function DatabasePage() {
+  const data = await getAdditives();
 
   const getBackgroundColor = (color: string) => {
     switch (color.toLowerCase()) {
@@ -88,12 +43,6 @@ export default function DatabasePage() {
     }
   };
 
-  const truncate = (text: string) =>
-    text.length > 20 ? `${text.slice(0, 20)}...` : text;
-
-  if (loading) return <p className="text-center">Loading...</p>;
-  if (error) return <p className="text-center text-red-600">Error: {error}</p>;
-
   return (
     <div className="container mx-auto py-10">
       <div className="flex flex-col gap-4">
@@ -105,12 +54,10 @@ export default function DatabasePage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-gray-800">#</TableHead>
+                <TableHead>#</TableHead>
                 {data.length > 0 &&
                   Object.keys(data[0]).map((key) => (
-                    <TableHead key={key} className="text-gray-800">
-                      {key.toUpperCase()}
-                    </TableHead>
+                    <TableHead key={key}>{key.toUpperCase()}</TableHead>
                   ))}
               </TableRow>
             </TableHeader>
@@ -118,20 +65,11 @@ export default function DatabasePage() {
               {data.map((item, index) => (
                 <TableRow
                   key={item.code || index}
-                  className={`${getBackgroundColor(item.color || '')} cursor-pointer`}
-                  onClick={() =>
-                    setExpandedIndex(index === expandedIndex ? null : index)
-                  }
+                  className={getBackgroundColor(item.color || '')}
                 >
-                  <TableCell className="text-gray-800">{index + 1}</TableCell>
-                  {Object.entries(item).map(([key, value], idx) => (
-                    <TableCell key={idx} className="text-gray-800">
-                      {key === 'description'
-                        ? expandedIndex === index
-                          ? value
-                          : truncate(value)
-                        : value}
-                    </TableCell>
+                  <TableCell>{index + 1}</TableCell>
+                  {Object.values(item).map((value, idx) => (
+                    <TableCell key={idx}>{value}</TableCell>
                   ))}
                 </TableRow>
               ))}
