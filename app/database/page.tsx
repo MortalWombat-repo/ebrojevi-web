@@ -1,4 +1,3 @@
-// app/database/page.tsx
 import React from 'react';
 import {
   Table,
@@ -32,13 +31,13 @@ export default async function DatabasePage() {
   const getBackgroundColor = (color: string) => {
     switch (color.toLowerCase()) {
       case 'green':
-        return 'bg-[#C1E1C1]';
+        return 'bg-[#C1E1C1] hover:bg-[#4ADE80] hover:shadow-[0_0_8px_2px_rgba(74,222,128,0.6)]';
       case 'yellow':
-        return 'bg-[#FFFAA0]';
+        return 'bg-[#FFFAA0] hover:bg-[#FACC15] hover:shadow-[0_0_8px_2px_rgba(250,204,21,0.6)]';
       case 'red':
-        return 'bg-[#FAA0A0]';
+        return 'bg-[#FAA0A0] hover:bg-[#F87171] hover:shadow-[0_0_8px_2px_rgba(248,113,113,0.6)]';
       default:
-        return '';
+        return 'bg-white hover:bg-gray-100 hover:shadow-[0_0_8px_2px_rgba(209,213,219,0.6)]';
     }
   };
 
@@ -64,7 +63,7 @@ export default async function DatabasePage() {
               {data.map((item, index) => (
                 <TableRow
                   key={item.code || index}
-                  className={`${getBackgroundColor(item.color || '')} transition-shadow duration-200 hover:shadow-[0_0_8px_2px_rgba(59,130,246,0.6)] hover:bg-opacity-80`}
+                  className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
                 >
                   <TableCell>{index + 1}</TableCell>
                   {Object.values(item).map((value, idx) => (
