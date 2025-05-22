@@ -115,7 +115,7 @@ function DatabasePage() {
                       </TableCell>
                     </TableRow>
                   )}
-                </React.Fragment>
+                </React.Fragment>8
               ))}
             </TableBody>
           </Table>
