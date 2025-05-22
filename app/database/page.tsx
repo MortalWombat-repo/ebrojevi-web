@@ -1,5 +1,7 @@
 // app/database/page.tsx
-import React from 'react';
+'use client';
+
+import { useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -13,22 +15,19 @@ interface Additive {
   [key: string]: string;
 }
 
-async function getAdditives(): Promise<Additive[]> {
-  const res = await fetch(
-    'https://ebrojevi-fast-api.onrender.com/database',
-    {
-      // never fetch this from the browser
-      cache: 'no-store'
-    }
-  );
-  if (!res.ok) {
-    throw new Error(`Failed to fetch additives: ${res.status}`);
-  }
-  return res.json();
-}
+export default function DatabasePage() {
+  const [data, setData] = useState<Additive[]>([]);
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
-export default async function DatabasePage() {
-  const data = await getAdditives();
+  useEffect(() => {
+    fetch('https://ebrojevi-fast-api.onrender.com/database')
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+        return res.json();
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error('Error fetching data:', error));
+  }, []);
 
   const getBackgroundColor = (color: string) => {
     switch (color.toLowerCase()) {
@@ -41,6 +40,22 @@ export default async function DatabasePage() {
       default:
         return '';
     }
+  };
+
+  const toggleRow = (id: string) => {
+    const newSet = new Set(expandedRows);
+    if (newSet.has(id)) newSet.delete(id);
+    else newSet.add(id);
+    setExpandedRows(newSet);
+  };
+
+  const renderDescription = (item: Additive) => {
+    const full = item.description || '';
+    const isExpanded = expandedRows.has(item.code);
+    if (isExpanded) return full;
+    // show first 20 chars + ...
+    const truncated = full.length > 20 ? `${full.slice(0, 20)}...` : full;
+    return truncated;
   };
 
   return (
@@ -66,10 +81,16 @@ export default async function DatabasePage() {
                 <TableRow
                   key={item.code || index}
                   className={getBackgroundColor(item.color || '')}
+                  onClick={() => toggleRow(item.code)}
+                  style={{ cursor: 'pointer' }}
                 >
                   <TableCell>{index + 1}</TableCell>
-                  {Object.values(item).map((value, idx) => (
-                    <TableCell key={idx}>{value}</TableCell>
+                  {Object.entries(item).map(([key, value], idx) => (
+                    <TableCell key={idx}>
+                      {key === 'description'
+                        ? renderDescription(item)
+                        : value}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))}
