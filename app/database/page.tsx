@@ -12,11 +12,7 @@ import {
 import { Input } from '@/components/ui/input';
 
 interface Additive {
-  id: string;
-  name: string;
-  description: string;
-  color: string;
-  category: string;
+  [key: string]: string; // dynamic keys like code, name, etc.
 }
 
 export default function DatabasePage() {
@@ -25,14 +21,17 @@ export default function DatabasePage() {
 
   useEffect(() => {
     fetch('https://ebrojevi-fast-api.onrender.com/database')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+        return res.json();
+      })
       .then((data) => setData(data))
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
   const filteredData = data.filter((item) =>
     Object.values(item).some((value) =>
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      value.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
 
@@ -62,26 +61,27 @@ export default function DatabasePage() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="max-w-sm"
         />
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px]">ID</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Category</TableHead>
+                <TableHead>#</TableHead>
+                {data.length > 0 &&
+                  Object.keys(data[0]).map((key) => (
+                    <TableHead key={key}>{key.toUpperCase()}</TableHead>
+                  ))}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredData.map((item) => (
+              {filteredData.map((item, index) => (
                 <TableRow
-                  key={item.id}
-                  className={getBackgroundColor(item.color)}
+                  key={item.code}
+                  className={getBackgroundColor(item.color || '')}
                 >
-                  <TableCell className="font-medium">{item.id}</TableCell>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.description}</TableCell>
-                  <TableCell>{item.category}</TableCell>
+                  <TableCell>{index + 1}</TableCell>
+                  {Object.values(item).map((value, idx) => (
+                    <TableCell key={idx}>{value}</TableCell>
+                  ))}
                 </TableRow>
               ))}
             </TableBody>
