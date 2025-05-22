@@ -16,17 +16,29 @@ interface Additive {
 }
 
 async function getAdditives(): Promise<Additive[]> {
-  const res = await fetch('https://ebrojevi-fast-api.onrender.com/database', {
-    cache: 'no-store',
-  });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch additives: ${res.status}`);
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+    const res = await fetch('https://ebrojevi-fast-api.onrender.com/database', {
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch additives: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    if (!Array.isArray(data)) {
+      throw new Error('Invalid data format: Expected an array');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    throw error; // Re-throw to be caught by the component
   }
-  const data = await res.json();
-  if (!Array.isArray(data)) {
-    throw new Error('Invalid data format: Expected an array');
-  }
-  return data;
 }
 
 function AdditivesTable({ additives }: { additives: Additive[] }) {
@@ -113,10 +125,14 @@ export default async function DatabasePage() {
       </div>
     );
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : 'Došlo je do pogreške prilikom dohvaćanja podataka. Pokušajte ponovno kasnije.';
     return (
       <div className="container mx-auto py-10 text-red-600">
-        <h1>Error</h1>
-        <p>{error instanceof Error ? error.message : 'An unexpected error occurred'}</p>
+        <h1>Pogreška</h1>
+        <p>{errorMessage}</p>
       </div>
     );
   }
