@@ -1,3 +1,4 @@
+// app/database/page.tsx
 import React from 'react';
 import {
   Table,
@@ -16,7 +17,8 @@ async function getAdditives(): Promise<Additive[]> {
   const res = await fetch(
     'https://ebrojevi-fast-api.onrender.com/database',
     {
-      cache: 'no-store',
+      // never fetch this from the browser
+      cache: 'no-store'
     }
   );
   if (!res.ok) {
@@ -31,22 +33,20 @@ export default async function DatabasePage() {
   const getBackgroundColor = (color: string) => {
     switch (color.toLowerCase()) {
       case 'green':
-        return 'bg-[#C1E1C1] hover:bg-[#4ADE80] hover:shadow-[0_0_8px_2px_rgba(74,222,128,0.6)]';
+        return 'bg-[#C1E1C1]';
       case 'yellow':
-        return 'bg-[#FFFAA0] hover:bg-[#FACC15] hover:shadow-[0_0_8px_2px_rgba(250,204,21,0.6)]';
+        return 'bg-[#FFFAA0]';
       case 'red':
-        return 'bg-[#FAA0A0] hover:bg-[#F87171] hover:shadow-[0_0_8px_2px_rgba(248,113,113,0.6)]';
+        return 'bg-[#FAA0A0]';
       default:
-        return 'bg-white hover:bg-gray-100 hover:shadow-[0_0_8px_2px_rgba(209,213,219,0.6)]';
+        return '';
     }
   };
 
   return (
-    <div className="container mx-auto py-10 text-gray-800">
+    <div className="container mx-auto py-10">
       <div className="flex flex-col gap-4">
-        <div className="mt-8">
-          <h1 className="text-2xl font-bold text-muted-foreground">Additives List</h1>
-        </div>
+        <h1 className="text-2xl font-bold">Additives List</h1>
         <p className="text-muted-foreground">
           Displaying all E-number additives with color-coded rows.
         </p>
@@ -65,7 +65,7 @@ export default async function DatabasePage() {
               {data.map((item, index) => (
                 <TableRow
                   key={item.code || index}
-                  className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
+                  className={getBackgroundColor(item.color || '')}
                 >
                   <TableCell>{index + 1}</TableCell>
                   {Object.values(item).map((value, idx) => (
