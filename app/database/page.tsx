@@ -101,7 +101,7 @@ function DatabasePage() {
                     {Object.entries(item).map(([key, value]) => (
                       <TableCell key={key}>
                         {key === 'description' && value.length > 20
-                          ? `${value.substring(0, 50)}...`
+                          ? `${value.substring(0, 70)}...`
                           : value}
                       </TableCell>
                     ))}
