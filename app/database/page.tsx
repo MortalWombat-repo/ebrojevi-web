@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -15,11 +15,21 @@ interface Additive {
   [key: string]: string;
 }
 
-interface AdditivesTableProps {
-  additives: Additive[];
+async function getAdditives(): Promise<Additive[]> {
+  const res = await fetch('https://ebrojevi-fast-api.onrender.com/database', {
+    cache: 'no-store',
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to fetch additives: ${res.status}`);
+  }
+  const data = await res.json();
+  if (!Array.isArray(data)) {
+    throw new Error('Invalid data format: Expected an array');
+  }
+  return data;
 }
 
-export function AdditivesTable({ additives }: AdditivesTableProps) {
+function AdditivesTable({ additives }: { additives: Additive[] }) {
   const [searchQuery, setSearchQuery] = useState('');
 
   const getBackgroundColor = (color: string) => {
@@ -37,22 +47,22 @@ export function AdditivesTable({ additives }: AdditivesTableProps) {
 
   const filteredAdditives = additives.filter(
     (additive) =>
-      additive.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      additive.name.toLowerCase().includes(searchQuery.toLowerCase())
+      additive.code?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      additive.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <div>
       <div className="mb-4">
         <label htmlFor="search" className="mr-2">
-          Search by code or name:
+          Pretraži po kodu ili nazivu:
         </label>
         <Input
           id="search"
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search by code or name"
+          placeholder="Pretraži po kodu ili nazivu"
           className="w-full md:w-1/2"
         />
       </div>
@@ -84,4 +94,30 @@ export function AdditivesTable({ additives }: AdditivesTableProps) {
       </div>
     </div>
   );
+}
+
+export default async function DatabasePage() {
+  try {
+    const data = await getAdditives();
+    return (
+      <div className="container mx-auto py-10 text-gray-800">
+        <div className="flex flex-col gap-4">
+          <div className="mt-8">
+            <h1 className="text-2xl font-bold text-muted-foreground">Additives List</h1>
+          </div>
+          <p className="text-muted-foreground">
+            Prikaz svih E-brojeva aditiva s redovima označenim bojama.
+          </p>
+          <AdditivesTable additives={data} />
+        </div>
+      </div>
+    );
+  } catch (error) {
+    return (
+      <div className="container mx-auto py-10 text-red-600">
+        <h1>Error</h1>
+        <p>{error instanceof Error ? error.message : 'An unexpected error occurred'}</p>
+      </div>
+    );
+  }
 }
