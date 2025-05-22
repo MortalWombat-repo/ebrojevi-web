@@ -92,20 +92,30 @@ function DatabasePage() {
             </TableHeader>
             <TableBody>
               {data.map((item, index) => (
-                <TableRow
-                  key={item.code || index}
-                  className={`transition-all duration-200 cursor-pointer ${getBackgroundColor(item.color || '')}`}
-                  onClick={() => toggleExpand(index)}
-                >
-                  <TableCell>{index + 1}</TableCell>
-                  {Object.entries(item).map(([key, value]) => (
-                    <TableCell key={key}>
-                      {key === 'description' && !expanded.has(index) && value.length > 20
-                        ? `${value.substring(0, 20)}...`
-                        : value}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                <React.Fragment key={item.code || index}>
+                  <TableRow
+                    className={`transition-all duration-200 cursor-pointer ${getBackgroundColor(item.color || '')}`}
+                    onClick={() => toggleExpand(index)}
+                  >
+                    <TableCell>{index + 1}</TableCell>
+                    {Object.entries(item).map(([key, value]) => (
+                      <TableCell key={key}>
+                        {key === 'description' && value.length > 20
+                          ? `${value.substring(0, 20)}...`
+                          : value}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  {expanded.has(index) && (
+                    <TableRow>
+                      <TableCell colSpan={1 + Object.keys(item).length}>
+                        <div className="p-2">
+                          <strong>Full Description:</strong> {item.description}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
               ))}
             </TableBody>
           </Table>
@@ -116,3 +126,5 @@ function DatabasePage() {
 }
 
 export default DatabasePage;
+
+when expanind on click the entire row is black i want it to just expand the selected row in other words replace the truncated row with the entire row
