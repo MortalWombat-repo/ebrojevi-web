@@ -68,9 +68,14 @@ export default async function DatabasePage() {
                   className={getBackgroundColor(item.color || '')}
                 >
                   <TableCell>{index + 1}</TableCell>
-                  {Object.values(item).map((value, idx) => (
-                    <TableCell key={idx}>{value}</TableCell>
-                  ))}
+                 {Object.entries(item).map(([key, value], idx) => (
+  <TableCell
+    key={idx}
+    className={key === 'description' ? 'text-left text-justify' : ''}
+  >
+    {value}
+  </TableCell>
+))}
                 </TableRow>
               ))}
             </TableBody>
