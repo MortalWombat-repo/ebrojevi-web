@@ -1,3 +1,27 @@
+// app/api/additives/route.ts
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  try {
+    const res = await fetch('https://ebrojevi-fast-api.onrender.com/database', { cache: 'no-store' });
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: `Upstream fetch failed: ${res.status}` },
+        { status: res.status }
+      );
+    }
+    const data = await res.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Network error fetching additives' },
+      { status: 502 }
+    );
+  }
+}
+
+
+// app/database/page.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -17,20 +41,22 @@ interface Additive {
 export default function DatabasePage() {
   const [data, setData] = useState<Additive[]>([]);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchAdditives() {
       try {
-        const res = await fetch(
-          'https://ebrojevi-fast-api.onrender.com/database',
-          { cache: 'no-store' }
-        );
-        if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+        const res = await fetch('/api/additives');
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || `Request failed: ${res.status}`);
+        }
         const json: Additive[] = await res.json();
         setData(json);
-      } catch (error) {
-        console.error(error);
+      } catch (err: any) {
+        console.error(err);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
@@ -54,9 +80,8 @@ export default function DatabasePage() {
   const truncate = (text: string) =>
     text.length > 20 ? `${text.slice(0, 20)}...` : text;
 
-  if (loading) {
-    return <p className="text-center">Loading...</p>;
-  }
+  if (loading) return <p className="text-center">Loading...</p>;
+  if (error) return <p className="text-center text-red-600">Error: {error}</p>;
 
   return (
     <div className="container mx-auto py-10">
