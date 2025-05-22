@@ -41,6 +41,18 @@ export default async function DatabasePage() {
     }
   };
 
+  // Function to assign specific widths to column headers
+  const getHeaderClass = (key: string) => {
+    switch (key) {
+      case 'code':
+        return 'w-[100px]'; // Narrow width for "code"
+      case 'name':
+        return 'w-[200px]'; // Moderate width for "name"
+      default:
+        return ''; // Other columns (e.g., "description") adjust automatically
+    }
+  };
+
   return (
     <div className="container mx-auto py-10 text-gray-800">
       <div className="flex flex-col gap-4">
@@ -51,13 +63,17 @@ export default async function DatabasePage() {
           Displaying all E-number additives with color-coded rows.
         </p>
         <div className="rounded-md border overflow-auto">
-          <Table>
+          {/* Apply fixed table layout and full width */}
+          <Table className="table-fixed w-full">
             <TableHeader>
               <TableRow>
-                <TableHead>#</TableHead>
+                {/* Fixed width for the "#" column */}
+                <TableHead className="w-[50px]">#</TableHead>
                 {data.length > 0 &&
                   Object.keys(data[0]).map((key) => (
-                    <TableHead key={key}>{key.toUpperCase()}</TableHead>
+                    <TableHead key={key} className={getHeaderClass(key)}>
+                      {key.toUpperCase()}
+                    </TableHead>
                   ))}
               </TableRow>
             </TableHeader>
@@ -67,9 +83,12 @@ export default async function DatabasePage() {
                   key={item.code || index}
                   className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
                 >
-                  <TableCell>{index + 1}</TableCell>
-                  {Object.values(item).map((value, idx) => (
-                    <TableCell key={idx}>{value}</TableCell>
+                  <TableCell className="w-[50px]">{index + 1}</TableCell>
+                  {/* Use Object.entries to maintain key-value pairing */}
+                  {Object.entries(item).map(([key, value], idx) => (
+                    <TableCell key={idx} className="whitespace-normal">
+                      {value}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))}
