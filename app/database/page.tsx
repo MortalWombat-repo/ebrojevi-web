@@ -1,6 +1,5 @@
-'use client';
-
-import React, { useState } from 'react';
+// app/database/page.tsx
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -15,26 +14,20 @@ interface Additive {
 }
 
 async function getAdditives(): Promise<Additive[]> {
-  const res = await fetch('https://ebrojevi-fast-api.onrender.com/database', {
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new Error(`Failed to fetch additives: ${res.status}`);
+  const res = await fetch(
+    'https://ebrojevi-fast-api.onrender.com/database',
+    {
+      cache: 'no-store',
+    }
+  );
+  if (!res.ok) {
+    throw new Error(`Failed to fetch additives: ${res.status}`);
+  }
   return res.json();
 }
 
-export default function DatabasePage() {
-  const [data, setData] = useState<Additive[]>([]);
-  const [expandedRow, setExpandedRow] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null); // New error state
-
-  React.useEffect(() => {
-    getAdditives()
-      .then(setData)
-      .catch((err) => {
-        console.error(err);
-        setError(err.message); // Set error message for display
-      });
-  }, []);
+export default async function DatabasePage() {
+  const data = await getAdditives();
 
   const getBackgroundColor = (color: string) => {
     switch (color.toLowerCase()) {
@@ -48,26 +41,6 @@ export default function DatabasePage() {
         return 'bg-white hover:bg-gray-100 hover:shadow-[0_0_8px_2px_rgba(209,213,219,0.6)]';
     }
   };
-
-  // Render error message if fetch fails
-  if (error) {
-    return (
-      <div className="container mx-auto py-10 text-gray-800">
-        <h1 className="text-2xl font-bold text-muted-foreground">Additives List</h1>
-        <p className="text-red-600 mt-4">Error: {error}</p>
-      </div>
-    );
-  }
-
-  // Render loading state if no data yet
-  if (data.length === 0) {
-    return (
-      <div className="container mx-auto py-10 text-gray-800">
-        <h1 className="text-2xl font-bold text-muted-foreground">Additives List</h1>
-        <p className="text-muted-foreground mt-4">Loading...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto py-10 text-gray-800">
@@ -83,45 +56,24 @@ export default function DatabasePage() {
             <TableHeader>
               <TableRow>
                 <TableHead>#</TableHead>
-                {data[0] &&
+                {data.length > 0 &&
                   Object.keys(data[0]).map((key) => (
                     <TableHead key={key}>{key.toUpperCase()}</TableHead>
                   ))}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((item, index) => {
-                const isExpanded = expandedRow === index;
-                return (
-                  <TableRow
-                    key={item.code || index}
-                    className={`transition-all duration-200 ${getBackgroundColor(
-                      item.color || ''
-                    )} cursor-pointer`}
-                    onClick={() => setExpandedRow(isExpanded ? null : index)}
-                  >
-                    <TableCell>{index + 1}</TableCell>
-                    {Object.keys(item).map((key) => {
-                      const value = item[key];
-                      const isDescription = key === 'description';
-                      const truncated =
-                        value.length > 20 ? `${value.slice(0, 20)}...` : value;
-
-                      return (
-                        <TableCell key={key}>
-                          {isDescription ? (
-                            <span className="whitespace-nowrap">
-                              {isExpanded ? value : truncated}
-                            </span>
-                          ) : (
-                            value
-                          )}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
+              {data.map((item, index) => (
+                <TableRow
+                  key={item.code || index}
+                  className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
+                >
+                  <TableCell>{index + 1}</TableCell>
+                  {Object.values(item).map((value, idx) => (
+                    <TableCell key={idx}>{value}</TableCell>
+                  ))}
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </div>
