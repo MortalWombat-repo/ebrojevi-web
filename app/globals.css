@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 215 30% 12%;
+    --foreground: 0 0% 98%;
+    --card: 215 30% 15%;
+    --card-foreground: 0 0% 98%;
+    --popover: 215 30% 15%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 135 80% 45%;
+    --primary-foreground: 215 30% 12%;
+    --secondary: 215 25% 25%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 215 25% 20%;
+    --muted-foreground: 215 5% 65%;
+    --accent: 135 80% 45%;
+    --accent-foreground: 215 30% 12%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 215 25% 25%;
+    --input: 215 25% 25%;
+    --ring: 135 80% 45%;
+    --chart-1: 135 80% 45%;
+    --chart-2: 215 30% 40%;
+    --chart-3: 215 25% 25%;
+    --chart-4: 135 70% 35%;
+    --chart-5: 135 60% 55%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 215 30% 12%;
+    --foreground: 0 0% 98%;
+    --card: 215 30% 15%;
+    --card-foreground: 0 0% 98%;
+    --popover: 215 30% 15%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 135 80% 45%;
+    --primary-foreground: 215 30% 12%;
+    --secondary: 215 25% 25%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 215 25% 20%;
+    --muted-foreground: 215 5% 65%;
+    --accent: 135 80% 45%;
+    --accent-foreground: 215 30% 12%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 215 25% 25%;
+    --input: 215 25% 25%;
+    --ring: 135 80% 45%;
+    --chart-1: 135 80% 45%;
+    --chart-2: 215 30% 40%;
+    --chart-3: 215 25% 25%;
+    --chart-4: 135 70% 35%;
+    --chart-5: 135 60% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
