@@ -15,10 +15,9 @@ interface Additive {
 }
 
 async function getAdditives(): Promise<Additive[]> {
-  const res = await fetch(
-    'https://ebrojevi-fast-api.onrender.com/database',
-    { cache: 'no-store' }
-  );
+  const res = await fetch('https://ebrojevi-fast-api.onrender.com/database', {
+    cache: 'no-store',
+  });
   if (!res.ok) throw new Error(`Failed to fetch additives: ${res.status}`);
   return res.json();
 }
@@ -26,9 +25,15 @@ async function getAdditives(): Promise<Additive[]> {
 export default function DatabasePage() {
   const [data, setData] = useState<Additive[]>([]);
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null); // New error state
 
   React.useEffect(() => {
-    getAdditives().then(setData).catch(console.error);
+    getAdditives()
+      .then(setData)
+      .catch((err) => {
+        console.error(err);
+        setError(err.message); // Set error message for display
+      });
   }, []);
 
   const getBackgroundColor = (color: string) => {
@@ -44,6 +49,26 @@ export default function DatabasePage() {
     }
   };
 
+  // Render error message if fetch fails
+  if (error) {
+    return (
+      <div className="container mx-auto py-10 text-gray-800">
+        <h1 className="text-2xl font-bold text-muted-foreground">Additives List</h1>
+        <p className="text-red-600 mt-4">Error: {error}</p>
+      </div>
+    );
+  }
+
+  // Render loading state if no data yet
+  if (data.length === 0) {
+    return (
+      <div className="container mx-auto py-10 text-gray-800">
+        <h1 className="text-2xl font-bold text-muted-foreground">Additives List</h1>
+        <p className="text-muted-foreground mt-4">Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-10 text-gray-800">
       <div className="flex flex-col gap-4">
@@ -58,9 +83,10 @@ export default function DatabasePage() {
             <TableHeader>
               <TableRow>
                 <TableHead>#</TableHead>
-                {data[0] && Object.keys(data[0]).map((key) => (
-                  <TableHead key={key}>{key.toUpperCase()}</TableHead>
-                ))}
+                {data[0] &&
+                  Object.keys(data[0]).map((key) => (
+                    <TableHead key={key}>{key.toUpperCase()}</TableHead>
+                  ))}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -69,22 +95,27 @@ export default function DatabasePage() {
                 return (
                   <TableRow
                     key={item.code || index}
-                    className={`transition-all duration-200 ${getBackgroundColor(item.color || '')} cursor-pointer`}
+                    className={`transition-all duration-200 ${getBackgroundColor(
+                      item.color || ''
+                    )} cursor-pointer`}
                     onClick={() => setExpandedRow(isExpanded ? null : index)}
                   >
                     <TableCell>{index + 1}</TableCell>
                     {Object.keys(item).map((key) => {
                       const value = item[key];
                       const isDescription = key === 'description';
-                      const truncated = value.length > 20 ? `${value.slice(0, 20)}...` : value;
-                      
+                      const truncated =
+                        value.length > 20 ? `${value.slice(0, 20)}...` : value;
+
                       return (
                         <TableCell key={key}>
                           {isDescription ? (
                             <span className="whitespace-nowrap">
                               {isExpanded ? value : truncated}
                             </span>
-                          ) : value}
+                          ) : (
+                            value
+                          )}
                         </TableCell>
                       );
                     })}
