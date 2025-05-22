@@ -1,16 +1,21 @@
 // app/database/page.tsx (Server Component)
 import React from 'react';
-import TableClient from './TableClient';
+import dynamic from 'next/dynamic';
 
 interface Additive {
   [key: string]: string;
 }
 
+// Dynamically import the client component
+const TableClient = dynamic(
+  () => import('./TableClient'),
+  { ssr: false }
+);
+
 async function getAdditives(): Promise<Additive[]> {
-  const res = await fetch(
-    'https://ebrojevi-fast-api.onrender.com/database',
-    { cache: 'no-store' }
-  );
+  const res = await fetch('https://ebrojevi-fast-api.onrender.com/database', {
+    cache: 'no-store'
+  });
   if (!res.ok) throw new Error(`Failed to fetch additives: ${res.status}`);
   return res.json();
 }
@@ -19,6 +24,7 @@ export default async function DatabasePage() {
   const data = await getAdditives();
   return <TableClient data={data} />;
 }
+
 
 // app/database/TableClient.tsx (Client Component)
 'use client';
