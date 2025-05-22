@@ -50,7 +50,7 @@ export default function DatabasePage() {
     : [];
 
   // Function to get background color based on item.color
-  const getBackgroundColor = (color: string) => {
+  const getBackgroundColor = (color = '') => {
     switch (color.toLowerCase()) {
       case 'green':
         return 'bg-[#C1E1C1] hover:bg-[#4ADE80] hover:shadow-[0_0_8px_2px_rgba(74,222,128,0.6)]';
@@ -74,30 +74,34 @@ export default function DatabasePage() {
         </p>
         <input
           type="text"
-          placeholder="Search by code or name"
+          placeholder="Search by code (e.g., E100) or name (e.g., Curcumin)"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="mb-4 p-2 border rounded"
+          className="mb-4 p-2 border rounded-md w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         {isLoading ? (
-          <p>Loading...</p>
+          <p className="text-center">Loading...</p>
         ) : !data || data.length === 0 ? (
-          <p>No data found</p>
+          <p className="text-center">No data found</p>
         ) : (
           <div className="rounded-md border overflow-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>#</TableHead>
-                  {Object.keys(data[0]).map((key) => (
-                    <TableHead key={key}>{key.toUpperCase()}</TableHead>
-                  ))}
+                  {data.length > 0 &&
+                    Object.keys(data[0]).map((key) => (
+                      <TableHead key={key}>{key.toUpperCase()}</TableHead>
+                    ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={Object.keys(data[0]).length + 1} className="text-center">
+                    <TableCell
+                      colSpan={(data.length > 0 ? Object.keys(data[0]).length : 0) + 1}
+                      className="text-center"
+                    >
                       No results found
                     </TableCell>
                   </TableRow>
@@ -105,7 +109,7 @@ export default function DatabasePage() {
                   filteredData.map((item, index) => (
                     <TableRow
                       key={item.code || index}
-                      className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
+                      className={`transition-all duration-200 ${getBackgroundColor(item.color)}`}
                     >
                       <TableCell>{index + 1}</TableCell>
                       {Object.values(item).map((value, idx) => (
