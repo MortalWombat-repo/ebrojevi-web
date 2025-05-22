@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -7,26 +9,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
 
 interface Additive {
   [key: string]: string;
 }
 
-async function getAdditives(): Promise<Additive[]> {
-  const res = await fetch(
-    'https://ebrojevi-fast-api.onrender.com/database',
-    {
-      cache: 'no-store',
-    }
-  );
-  if (!res.ok) {
-    throw new Error(`Failed to fetch additives: ${res.status}`);
-  }
-  return res.json();
+interface AdditivesTableProps {
+  additives: Additive[];
 }
 
-export default async function DatabasePage() {
-  const data = await getAdditives();
+export function AdditivesTable({ additives }: AdditivesTableProps) {
+  const [searchQuery, setSearchQuery] = useState('');
 
   const getBackgroundColor = (color: string) => {
     switch (color.toLowerCase()) {
@@ -41,41 +35,52 @@ export default async function DatabasePage() {
     }
   };
 
+  const filteredAdditives = additives.filter(
+    (additive) =>
+      additive.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      additive.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="container mx-auto py-10 text-gray-800">
-      <div className="flex flex-col gap-4">
-        <div className="mt-8">
-          <h1 className="text-2xl font-bold text-muted-foreground">Popis aditiva</h1>
-        </div>
-        <p className="text-muted-foreground">
-          Prikaz svih E-brojeva označeni bojama
-        </p>
-        <div className="rounded-md border overflow-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>#</TableHead>
-                {data.length > 0 &&
-                  Object.keys(data[0]).map((key) => (
-                    <TableHead key={key}>{key.toUpperCase()}</TableHead>
-                  ))}
+    <div>
+      <div className="mb-4">
+        <label htmlFor="search" className="mr-2">
+          Search by code or name:
+        </label>
+        <Input
+          id="search"
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search by code or name"
+          className="w-full md:w-1/2"
+        />
+      </div>
+      <div className="rounded-md border overflow-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>#</TableHead>
+              {additives.length > 0 &&
+                Object.keys(additives[0]).map((key) => (
+                  <TableHead key={key}>{key.toUpperCase()}</TableHead>
+                ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredAdditives.map((item, index) => (
+              <TableRow
+                key={item.code || index}
+                className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
+              >
+                <TableCell>{index + 1}</TableCell>
+                {Object.values(item).map((value, idx) => (
+                  <TableCell key={idx}>{value}</TableCell>
+                ))}
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.map((item, index) => (
-                <TableRow
-                  key={item.code || index}
-                  className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
-                >
-                  <TableCell>{index + 1}</TableCell>
-                  {Object.values(item).map((value, idx) => (
-                    <TableCell key={idx}>{value}</TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
