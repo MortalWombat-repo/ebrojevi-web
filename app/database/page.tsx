@@ -49,6 +49,12 @@ export default async function DatabasePage() {
           return 'w-[100px]';
         case 'name':
           return 'w-[200px]';
+        case 'description':
+          return 'max-w-[300px]'; // Constrain description column
+        case 'type':
+          return 'w-[100px]'; // Narrow width for type
+        case 'adi':
+          return 'w-[100px]'; // Narrow width for adi
         default:
           return '';
       }
