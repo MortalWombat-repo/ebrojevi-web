@@ -42,22 +42,33 @@ export default async function DatabasePage() {
       }
     };
 
-    // Function to assign specific widths to column headers
+    // Function to assign specific widths and centering to column headers
     const getHeaderClass = (key: string) => {
+      const baseClasses = 'text-center'; // Center all headers
       switch (key) {
         case 'code':
-          return 'w-[100px]';
+          return `${baseClasses} w-[100px]`;
         case 'name':
-          return 'w-[250px]'; // Increased width for longer names
+          return `${baseClasses} w-[250px]`;
         case 'description':
-          return 'max-w-[300px]';
+          return 'max-w-[300px]'; // Description remains left-aligned for readability
         case 'type':
-          return 'w-[100px]';
+          return `${baseClasses} w-[100px]`;
         case 'adi':
-          return 'w-[100px]';
+          return `${baseClasses} w-[100px]`;
         default:
-          return '';
+          return baseClasses;
       }
+    };
+
+    // Function to apply centering to table cells
+    const getCellClass = (key: string) => {
+      const baseClasses = 'whitespace-normal p-2 align-top';
+      // Center cells for #, code, name, type, and adi
+      if (['code', 'name', 'type', 'adi'].includes(key)) {
+        return `${baseClasses} text-center`;
+      }
+      return baseClasses; // Description remains left-aligned
     };
 
     // Filter out the 'color' key for table headers and cells
@@ -76,7 +87,7 @@ export default async function DatabasePage() {
             <Table className="table-fixed w-full">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[50px]">#</TableHead>
+                  <TableHead className="w-[50px] text-center">#</TableHead>
                   {visibleColumns.map((key) => (
                     <TableHead key={key} className={getHeaderClass(key)}>
                       {key.toUpperCase()}
@@ -90,13 +101,13 @@ export default async function DatabasePage() {
                     key={item.code || index}
                     className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
                   >
-                    <TableCell className="w-[50px] whitespace-normal p-2">
+                    <TableCell className="w-[50px] whitespace-normal p-2 align-top text-center">
                       {index + 1}
                     </TableCell>
                     {visibleColumns.map((key, idx) => (
                       <TableCell
                         key={idx}
-                        className="whitespace-normal p-2 align-top"
+                        className={getCellClass(key)}
                       >
                         {item[key]}
                       </TableCell>
