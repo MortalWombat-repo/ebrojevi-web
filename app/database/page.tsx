@@ -1,4 +1,6 @@
-import React from 'react';
+'use client'
+
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -8,26 +10,46 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-interface Additive {
-  [key: string]: string;
-}
+export default function DatabasePage() {
+  const [data, setData] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
-async function getAdditives(): Promise<Additive[]> {
-  const res = await fetch(
-    'https://ebrojevi-fast-api.onrender.com/database',
-    {
-      cache: 'no-store',
+  // Fetch data when the component mounts
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      try {
+        const res = await fetch(
+          'https://ebrojevi-fast-api.onrender.com/database',
+          {
+            cache: 'no-store',
+          }
+        );
+        if (!res.ok) {
+          throw new Error(`Failed to fetch additives: ${res.status}`);
+        }
+        const additives = await res.json();
+        setData(additives);
+      } catch (error) {
+        console.error(error);
+        setData([]);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  );
-  if (!res.ok) {
-    throw new Error(`Failed to fetch additives: ${res.status}`);
-  }
-  return res.json();
-}
+    fetchData();
+  }, []);
 
-export default async function DatabasePage() {
-  const data = await getAdditives();
+  // Compute filtered data based on search term
+  const filteredData = data
+    ? data.filter((item) =>
+        item.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
+  // Function to get background color based on item.color
   const getBackgroundColor = (color: string) => {
     switch (color.toLowerCase()) {
       case 'green':
@@ -50,32 +72,52 @@ export default async function DatabasePage() {
         <p className="text-muted-foreground">
           Displaying all E-number additives with color-coded rows.
         </p>
-        <div className="rounded-md border overflow-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>#</TableHead>
-                {data.length > 0 &&
-                  Object.keys(data[0]).map((key) => (
+        <input
+          type="text"
+          placeholder="Search by code or name"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="mb-4 p-2 border rounded"
+        />
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : !data || data.length === 0 ? (
+          <p>No data found</p>
+        ) : (
+          <div className="rounded-md border overflow-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>#</TableHead>
+                  {Object.keys(data[0]).map((key) => (
                     <TableHead key={key}>{key.toUpperCase()}</TableHead>
                   ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.map((item, index) => (
-                <TableRow
-                  key={item.code || index}
-                  className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
-                >
-                  <TableCell>{index + 1}</TableCell>
-                  {Object.values(item).map((value, idx) => (
-                    <TableCell key={idx}>{value}</TableCell>
-                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {filteredData.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={Object.keys(data[0]).length + 1} className="text-center">
+                      No results found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredData.map((item, index) => (
+                    <TableRow
+                      key={item.code || index}
+                      className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
+                    >
+                      <TableCell>{index + 1}</TableCell>
+                      {Object.values(item).map((value, idx) => (
+                        <TableCell key={idx}>{value}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </div>
     </div>
   );
