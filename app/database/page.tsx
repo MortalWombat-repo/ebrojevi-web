@@ -48,13 +48,13 @@ export default async function DatabasePage() {
         case 'code':
           return 'w-[100px]';
         case 'name':
-          return 'w-[200px]';
+          return 'w-[250px]'; // Increased width for longer names
         case 'description':
-          return 'max-w-[300px]'; // Constrain description column
+          return 'max-w-[300px]';
         case 'type':
-          return 'w-[100px]'; // Narrow width for type
+          return 'w-[100px]';
         case 'adi':
-          return 'w-[100px]'; // Narrow width for adi
+          return 'w-[100px]';
         default:
           return '';
       }
@@ -90,9 +90,14 @@ export default async function DatabasePage() {
                     key={item.code || index}
                     className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
                   >
-                    <TableCell className="w-[50px]">{index + 1}</TableCell>
+                    <TableCell className="w-[50px] whitespace-normal p-2">
+                      {index + 1}
+                    </TableCell>
                     {visibleColumns.map((key, idx) => (
-                      <TableCell key={idx} className="whitespace-normal">
+                      <TableCell
+                        key={idx}
+                        className="whitespace-normal p-2 align-top"
+                      >
                         {item[key]}
                       </TableCell>
                     ))}
