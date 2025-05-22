@@ -1,6 +1,4 @@
-'use client';
-
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -9,40 +7,26 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
 
 interface Additive {
   [key: string]: string;
 }
 
 async function getAdditives(): Promise<Additive[]> {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-    const res = await fetch('https://ebrojevi-fast-api.onrender.com/database', {
+  const res = await fetch(
+    'https://ebrojevi-fast-api.onrender.com/database',
+    {
       cache: 'no-store',
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-
-    if (!res.ok) {
-      throw new Error(`Failed to fetch additives: ${res.status} ${res.statusText}`);
     }
-
-    const data = await res.json();
-    if (!Array.isArray(data)) {
-      throw new Error('Invalid data format: Expected an array');
-    }
-
-    return data;
-  } catch (error) {
-    console.error('Fetch error:', error);
-    throw error; // Re-throw to be caught by the component
+  );
+  if (!res.ok) {
+    throw new Error(`Failed to fetch additives: ${res.status}`);
   }
+  return res.json();
 }
 
-function AdditivesTable({ additives }: { additives: Additive[] }) {
-  const [searchQuery, setSearchQuery] = useState('');
+export default async function DatabasePage() {
+  const data = await getAdditives();
 
   const getBackgroundColor = (color: string) => {
     switch (color.toLowerCase()) {
@@ -57,83 +41,42 @@ function AdditivesTable({ additives }: { additives: Additive[] }) {
     }
   };
 
-  const filteredAdditives = additives.filter(
-    (additive) =>
-      additive.code?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      additive.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
-    <div>
-      <div className="mb-4">
-        <label htmlFor="search" className="mr-2">
-          Pretraži po kodu ili nazivu:
-        </label>
-        <Input
-          id="search"
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Pretraži po kodu ili nazivu"
-          className="w-full md:w-1/2"
-        />
-      </div>
-      <div className="rounded-md border overflow-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>#</TableHead>
-              {additives.length > 0 &&
-                Object.keys(additives[0]).map((key) => (
-                  <TableHead key={key}>{key.toUpperCase()}</TableHead>
-                ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredAdditives.map((item, index) => (
-              <TableRow
-                key={item.code || index}
-                className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
-              >
-                <TableCell>{index + 1}</TableCell>
-                {Object.values(item).map((value, idx) => (
-                  <TableCell key={idx}>{value}</TableCell>
-                ))}
+    <div className="container mx-auto py-10 text-gray-800">
+      <div className="flex flex-col gap-4">
+        <div className="mt-8">
+          <h1 className="text-2xl font-bold text-muted-foreground">Additives List</h1>
+        </div>
+        <p className="text-muted-foreground">
+          Displaying all E-number additives with color-coded rows.
+        </p>
+        <div className="rounded-md border overflow-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>#</TableHead>
+                {data.length > 0 &&
+                  Object.keys(data[0]).map((key) => (
+                    <TableHead key={key}>{key.toUpperCase()}</TableHead>
+                  ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {data.map((item, index) => (
+                <TableRow
+                  key={item.code || index}
+                  className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
+                >
+                  <TableCell>{index + 1}</TableCell>
+                  {Object.values(item).map((value, idx) => (
+                    <TableCell key={idx}>{value}</TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );
-}
-
-export default async function DatabasePage() {
-  try {
-    const data = await getAdditives();
-    return (
-      <div className="container mx-auto py-10 text-gray-800">
-        <div className="flex flex-col gap-4">
-          <div className="mt-8">
-            <h1 className="text-2xl font-bold text-muted-foreground">Additives List</h1>
-          </div>
-          <p className="text-muted-foreground">
-            Prikaz svih E-brojeva aditiva s redovima označenim bojama.
-          </p>
-          <AdditivesTable additives={data} />
-        </div>
-      </div>
-    );
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : 'Došlo je do pogreške prilikom dohvaćanja podataka. Pokušajte ponovno kasnije.';
-    return (
-      <div className="container mx-auto py-10 text-red-600">
-        <h1>Pogreška</h1>
-        <p>{errorMessage}</p>
-      </div>
-    );
-  }
 }
