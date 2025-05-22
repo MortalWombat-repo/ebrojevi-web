@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
 
 interface Additive {
   [key: string]: string; // dynamic keys like code, name, etc.
@@ -17,7 +16,6 @@ interface Additive {
 
 export default function DatabasePage() {
   const [data, setData] = useState<Additive[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetch('https://ebrojevi-fast-api.onrender.com/database')
@@ -28,12 +26,6 @@ export default function DatabasePage() {
       .then((data) => setData(data))
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
-
-  const filteredData = data.filter((item) =>
-    Object.values(item).some((value) =>
-      value.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
 
   const getBackgroundColor = (color: string) => {
     switch (color.toLowerCase()) {
@@ -53,14 +45,8 @@ export default function DatabasePage() {
       <div className="flex flex-col gap-4">
         <h1 className="text-2xl font-bold">Additives List</h1>
         <p className="text-muted-foreground">
-          Use the search box to filter by any field.
+          Displaying all E-number additives with color-coded rows based on their safety classification.
         </p>
-        <Input
-          placeholder="Search..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
-        />
         <div className="rounded-md border overflow-auto">
           <Table>
             <TableHeader>
@@ -73,7 +59,7 @@ export default function DatabasePage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredData.map((item, index) => (
+              {data.map((item, index) => (
                 <TableRow
                   key={item.code}
                   className={getBackgroundColor(item.color || '')}
