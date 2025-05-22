@@ -23,7 +23,7 @@ function DatabasePage() {
   useEffect(() => {
     async function getAdditives() {
       try {
-        const res = await fetch('/api/additives', {
+        const res = await fetch('/api', {
           cache: 'no-store',
         });
         if (!res.ok) {
@@ -101,7 +101,7 @@ function DatabasePage() {
                     {Object.entries(item).map(([key, value]) => (
                       <TableCell key={key}>
                         {key === 'description' && value.length > 20
-                          ? `${value.substring(0, 20)}...`
+                          ? `${value.substring(0, 250)}...`
                           : value}
                       </TableCell>
                     ))}
