@@ -82,13 +82,13 @@ const HeroSection = () => {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-[100vh] flex items-center justify-center px-6 md:px-8 overflow-hidden snap-start"
+      className="relative h-full flex items-center justify-center px-6 md:px-8 overflow-hidden"
     >
       {/* Animated dot grid background */}
       <div className="absolute inset-0 z-0">
         <div
           ref={gridRef}
-          className="absolute inset-[-20%] transition-transform duration-[50ms] ease-out"
+          className="absolute inset-0 transition-transform duration-[50ms] ease-out"
           style={{
             backgroundImage:
               'radial-gradient(circle at center, rgba(132, 255, 132, 0.5) 2.5px, transparent 2.5px)',

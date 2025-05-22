@@ -1,4 +1,3 @@
-// app/page.tsx
 'use client';
 
 import HeroSection from '@/components/home/HeroSection';
@@ -7,19 +6,17 @@ import Footer from '@/components/layout/Footer';
 
 export default function Home() {
   return (
-    <div className="snap-y snap-mandatory overflow-y-auto">
-      <main>
-        {/* Hero: full viewport */}
-        <section className="min-h-screen snap-start">
-          <HeroSection />
-        </section>
+    <div className="min-h-screen flex flex-col">
+      {/* Hero: full viewport */}
+      <section className="h-screen flex-none">
+        <HeroSection />
+      </section>
 
-        {/* Features + Footer: auto height */}
-        <section className="snap-start px-6 md:px-8 py-12 bg-gradient-to-b from-[#1a2332] to-[#141c28]">
-          <FeatureSection />
-          <Footer />
-        </section>
-      </main>
+      {/* Features + Footer: full viewport */}
+      <section className="min-h-screen flex-none bg-gradient-to-b from-[#1a2332] to-[#141c28]">
+        <FeatureSection />
+        <Footer />
+      </section>
     </div>
   );
 }
