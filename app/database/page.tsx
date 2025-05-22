@@ -1,6 +1,29 @@
+// app/database/page.tsx (Server Component)
+import React from 'react';
+import TableClient from './TableClient';
+
+interface Additive {
+  [key: string]: string;
+}
+
+async function getAdditives(): Promise<Additive[]> {
+  const res = await fetch(
+    'https://ebrojevi-fast-api.onrender.com/database',
+    { cache: 'no-store' }
+  );
+  if (!res.ok) throw new Error(`Failed to fetch additives: ${res.status}`);
+  return res.json();
+}
+
+export default async function DatabasePage() {
+  const data = await getAdditives();
+  return <TableClient data={data} />;
+}
+
+// app/database/TableClient.tsx (Client Component)
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -14,19 +37,12 @@ interface Additive {
   [key: string]: string;
 }
 
-export default function DatabasePage() {
-  const [data, setData] = useState<Additive[]>([]);
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+interface Props {
+  data: Additive[];
+}
 
-  useEffect(() => {
-    fetch('https://ebrojevi-fast-api.onrender.com/database')
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-        return res.json();
-      })
-      .then(setData)
-      .catch(err => console.error('Error fetching data:', err));
-  }, []);
+export default function TableClient({ data }: Props) {
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const getBackgroundColor = (color = '') => {
     switch (color.toLowerCase()) {
@@ -48,8 +64,7 @@ export default function DatabasePage() {
   const renderDescription = (item: Additive) => {
     const full = item.description || '';
     const isExpanded = expandedRows.has(item.code);
-    if (isExpanded) return full;
-    return full.length > 20 ? `${full.slice(0, 20)}…` : full;
+    return isExpanded ? full : (full.length > 20 ? `${full.slice(0, 20)}…` : full);
   };
 
   return (
@@ -58,7 +73,6 @@ export default function DatabasePage() {
       <p className="text-muted-foreground mb-4">
         Click a row to toggle full description.
       </p>
-
       <div className="rounded-md border overflow-auto">
         <Table>
           <TableHeader>
@@ -69,7 +83,6 @@ export default function DatabasePage() {
               ))}
             </TableRow>
           </TableHeader>
-
           <TableBody>
             {data.map((item, i) => (
               <TableRow
@@ -81,9 +94,7 @@ export default function DatabasePage() {
                 <TableCell>{i + 1}</TableCell>
                 {Object.entries(item).map(([key, val]) => (
                   <TableCell key={key}>
-                    {key === 'description'
-                      ? renderDescription(item)
-                      : val}
+                    {key === 'description' ? renderDescription(item) : val}
                   </TableCell>
                 ))}
               </TableRow>
