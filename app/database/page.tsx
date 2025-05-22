@@ -23,7 +23,7 @@ function DatabasePage() {
   useEffect(() => {
     async function getAdditives() {
       try {
-        const res = await fetch('/api', {
+        const res = await fetch('/api/additives', {
           cache: 'no-store',
         });
         if (!res.ok) {
@@ -92,30 +92,20 @@ function DatabasePage() {
             </TableHeader>
             <TableBody>
               {data.map((item, index) => (
-                <React.Fragment key={item.code || index}>
-                  <TableRow
-                    className={`transition-all duration-200 cursor-pointer ${getBackgroundColor(item.color || '')}`}
-                    onClick={() => toggleExpand(index)}
-                  >
-                    <TableCell>{index + 1}</TableCell>
-                    {Object.entries(item).map(([key, value]) => (
-                      <TableCell key={key}>
-                        {key === 'description' && value.length > 20
-                          ? `${value.substring(0, 200)}...`
-                          : value}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                  {expanded.has(index) && (
-                    <TableRow>
-                      <TableCell colSpan={1 + Object.keys(item).length}>
-                        <div className="p-2">
-                          <strong>Full Description:</strong> {item.description}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </React.Fragment>
+                <TableRow
+                  key={item.code || index}
+                  className={`transition-all duration-200 cursor-pointer ${getBackgroundColor(item.color || '')}`}
+                  onClick={() => toggleExpand(index)}
+                >
+                  <TableCell>{index + 1}</TableCell>
+                  {Object.entries(item).map(([key, value]) => (
+                    <TableCell key={key}>
+                      {key === 'description' && !expanded.has(index) && value.length > 20
+                        ? `${value.substring(0, 20)}...`
+                        : value}
+                    </TableCell>
+                  ))}
+                </TableRow>
               ))}
             </TableBody>
           </Table>
