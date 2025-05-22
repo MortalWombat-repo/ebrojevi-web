@@ -1,6 +1,29 @@
-'use client';
+// app/api/additives/route.ts
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  try {
+    const res = await fetch('https://ebrojevi-fast-api.onrender.com/database', { cache: 'no-store' });
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: `Upstream fetch failed: ${res.status}` },
+        { status: res.status }
+      );
+    }
+    const data = await res.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Network error fetching additives' },
+      { status: 502 }
+    );
+  }
+}
+
 
 // app/database/page.tsx
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -25,11 +48,22 @@ export default function DatabasePage() {
     async function fetchAdditives() {
       try {
         const res = await fetch('/api/additives');
+        const contentType = res.headers.get('content-type') || '';
         if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.error || `Request failed: ${res.status}`);
+          let errMsg = `Request failed: ${res.status}`;
+          if (contentType.includes('application/json')) {
+            const errJson = await res.json();
+            errMsg = errJson.error || errMsg;
+          }
+          throw new Error(errMsg);
         }
-        const json: Additive[] = await res.json();
+        let json: Additive[];
+        if (contentType.includes('application/json')) {
+          json = await res.json();
+        } else {
+          const text = await res.text();
+          throw new Error('Invalid JSON response');
+        }
         setData(json);
       } catch (err: any) {
         console.error(err);
