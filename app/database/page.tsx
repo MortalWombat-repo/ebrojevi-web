@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -15,18 +17,19 @@ interface Additive {
 async function getAdditives(): Promise<Additive[]> {
   const res = await fetch(
     'https://ebrojevi-fast-api.onrender.com/database',
-    {
-      cache: 'no-store',
-    }
+    { cache: 'no-store' }
   );
-  if (!res.ok) {
-    throw new Error(`Failed to fetch additives: ${res.status}`);
-  }
+  if (!res.ok) throw new Error(`Failed to fetch additives: ${res.status}`);
   return res.json();
 }
 
-export default async function DatabasePage() {
-  const data = await getAdditives();
+export default function DatabasePage() {
+  const [data, setData] = useState<Additive[]>([]);
+  const [expandedRow, setExpandedRow] = useState<number | null>(null);
+
+  React.useEffect(() => {
+    getAdditives().then(setData).catch(console.error);
+  }, []);
 
   const getBackgroundColor = (color: string) => {
     switch (color.toLowerCase()) {
@@ -55,24 +58,39 @@ export default async function DatabasePage() {
             <TableHeader>
               <TableRow>
                 <TableHead>#</TableHead>
-                {data.length > 0 &&
-                  Object.keys(data[0]).map((key) => (
-                    <TableHead key={key}>{key.toUpperCase()}</TableHead>
-                  ))}
+                {data[0] && Object.keys(data[0]).map((key) => (
+                  <TableHead key={key}>{key.toUpperCase()}</TableHead>
+                ))}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((item, index) => (
-                <TableRow
-                  key={item.code || index}
-                  className={`transition-all duration-200 ${getBackgroundColor(item.color || '')}`}
-                >
-                  <TableCell>{index + 1}</TableCell>
-                  {Object.values(item).map((value, idx) => (
-                    <TableCell key={idx}>{value}</TableCell>
-                  ))}
-                </TableRow>
-              ))}
+              {data.map((item, index) => {
+                const isExpanded = expandedRow === index;
+                return (
+                  <TableRow
+                    key={item.code || index}
+                    className={`transition-all duration-200 ${getBackgroundColor(item.color || '')} cursor-pointer`}
+                    onClick={() => setExpandedRow(isExpanded ? null : index)}
+                  >
+                    <TableCell>{index + 1}</TableCell>
+                    {Object.keys(item).map((key) => {
+                      const value = item[key];
+                      const isDescription = key === 'description';
+                      const truncated = value.length > 20 ? `${value.slice(0, 20)}...` : value;
+                      
+                      return (
+                        <TableCell key={key}>
+                          {isDescription ? (
+                            <span className="whitespace-nowrap">
+                              {isExpanded ? value : truncated}
+                            </span>
+                          ) : value}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
