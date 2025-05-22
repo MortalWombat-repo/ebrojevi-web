@@ -126,5 +126,3 @@ function DatabasePage() {
 }
 
 export default DatabasePage;
-
-when expanind on click the entire row is black i want it to just expand the selected row in other words replace the truncated row with the entire row
