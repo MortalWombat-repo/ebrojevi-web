@@ -44,7 +44,7 @@ export default async function DatabasePage() {
   return (
     <div className="container mx-auto py-10 text-gray-800">
       <div className="flex flex-col gap-4">
-        <div className="mt-4">
+        <div className="mt-8">
           <h1 className="text-2xl font-bold text-muted-foreground">Additives List</h1>
         </div>
         <p className="text-muted-foreground">
