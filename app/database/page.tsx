@@ -48,7 +48,7 @@ export default async function DatabasePage() {
           <h1 className="text-2xl font-bold text-muted-foreground">Popis aditiva</h1>
         </div>
         <p className="text-muted-foreground">
-          Prikaz svih E-brojeva označeni bojama...
+          Prikaz svih E-brojeva označeni bojama
         </p>
         <div className="rounded-md border overflow-auto">
           <Table>
