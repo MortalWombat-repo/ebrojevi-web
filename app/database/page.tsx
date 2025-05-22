@@ -18,22 +18,33 @@ interface Additive {
 function DatabasePage() {
   const [data, setData] = useState<Additive[]>([]);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function getAdditives() {
-      const res = await fetch('https://ebrojevi-fast-api.onrender.com/database', {
-        cache: 'no-store',
-      });
-      if (!res.ok) {
-        throw new Error(`Failed to fetch additives: ${res.status}`);
+      try {
+        const res = await fetch('/api', {
+          cache: 'no-store',
+        });
+        if (!res.ok) {
+          throw new Error(`Failed to fetch additives: ${res.status}`);
+        }
+        const data = await res.json();
+        setData(data);
+      } catch (err) {
+        setError(err.message);
       }
-      const data = await res.json();
-      setData(data);
     }
     getAdditives();
   }, []);
 
-  if (data.length === 0) {
+  // Display error if fetch fails
+  if (error) {
+    return <div className="text-red-500">Error: {error}</div>;
+  }
+
+  // Show loading state while data is being fetched
+  if (data.length === 0 && !error) {
     return <div>Loading...</div>;
   }
 
