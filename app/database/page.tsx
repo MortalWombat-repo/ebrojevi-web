@@ -1,6 +1,5 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+// app/database/page.tsx
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -11,21 +10,25 @@ import {
 } from '@/components/ui/table';
 
 interface Additive {
-  [key: string]: string; // dynamic keys like code, name, etc.
+  [key: string]: string;
 }
 
-export default function DatabasePage() {
-  const [data, setData] = useState<Additive[]>([]);
+async function getAdditives(): Promise<Additive[]> {
+  const res = await fetch(
+    'https://ebrojevi-fast-api.onrender.com/database',
+    {
+      // never fetch this from the browser
+      cache: 'no-store'
+    }
+  );
+  if (!res.ok) {
+    throw new Error(`Failed to fetch additives: ${res.status}`);
+  }
+  return res.json();
+}
 
-  useEffect(() => {
-    fetch('https://ebrojevi-fast-api.onrender.com/database')
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-        return res.json();
-      })
-      .then((data) => setData(data))
-      .catch((error) => console.error('Error fetching data:', error));
-  }, []);
+export default async function DatabasePage() {
+  const data = await getAdditives();
 
   const getBackgroundColor = (color: string) => {
     switch (color.toLowerCase()) {
@@ -45,7 +48,7 @@ export default function DatabasePage() {
       <div className="flex flex-col gap-4">
         <h1 className="text-2xl font-bold">Additives List</h1>
         <p className="text-muted-foreground">
-          Displaying all E-number additives with color-coded rows based on their safety classification.
+          Displaying all E-number additives with color-coded rows.
         </p>
         <div className="rounded-md border overflow-auto">
           <Table>
@@ -61,7 +64,7 @@ export default function DatabasePage() {
             <TableBody>
               {data.map((item, index) => (
                 <TableRow
-                  key={item.code}
+                  key={item.code || index}
                   className={getBackgroundColor(item.color || '')}
                 >
                   <TableCell>{index + 1}</TableCell>
