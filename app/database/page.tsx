@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Code } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 interface Additive {
   [key: string]: string;
@@ -20,6 +20,7 @@ function DatabasePage() {
   const [data, setData] = useState<Additive[]>([]);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     async function getAdditives() {
@@ -69,26 +70,43 @@ function DatabasePage() {
   const toggleExpand = (index: number) => {
     const newExpanded = new Set(expanded);
     if (newExpanded.has(index)) {
-      sostanz: newExpanded.delete(index);
+      newExpanded.delete(index);
     } else {
       newExpanded.add(index);
     }
     setExpanded(newExpanded);
   };
 
+  const filteredData = data.filter((item) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      item.code?.toLowerCase().includes(searchLower) ||
+      item.name?.toLowerCase().includes(searchLower)
+    );
+  });
+
   return (
     <div className="container mx-auto py-10 text-gray-800 max-w-7xl">
-  <div className="flex flex-col gap-4 items-center">
-    <div className="mt-8 flex items-center space-x-2">
-      <h1 className="text-2xl font-bold text-white">
-        Popis Ebrojeva
-      </h1>
-    </div>
-    <p className="text-muted-foreground text-center max-w-2xl">
-      Prikaz svih Ebrojeva označenih bojama po štetnosti.
-    </p>
-    <div className="rounded-md border overflow-auto w-full">
-      <Table>
+      <div className="flex flex-col gap-4 items-center">
+        <div className="mt-8 flex items-center space-x-2">
+          <h1 className="text-2xl font-bold text-white">
+            Popis Ebrojeva
+          </h1>
+        </div>
+        <p className="text-muted-foreground text-center max-w-2xl">
+          Prikaz svih Ebrojeva označenih bojama po štetnosti.
+        </p>
+        <div className="w-full max-w-md mb-4">
+          <Input
+            type="text"
+            placeholder="Pretraži po kodu ili nazivu..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full"
+          />
+        </div>
+        <div className="rounded-md border overflow-auto w-full">
+          <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="text-center">#</TableHead>
@@ -100,7 +118,7 @@ function DatabasePage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((item, index) => (
+              {filteredData.map((item, index) => (
                 <React.Fragment key={item.code || index}>
                   <TableRow
                     className={`transition-all duration-200 cursor-pointer ${getBackgroundColor(
@@ -127,13 +145,14 @@ function DatabasePage() {
                     ))}
                   </TableRow>
                   {expanded.has(index) && (
-                    <TableRow>
+                    <TableRow className={getBackgroundColor(item.color || '')}>
                       <TableCell
                         colSpan={1 + Object.keys(item).length}
                         className="align-middle"
                       >
-                        <div className="p-2 text-center">
-                          <strong>Full Description:</strong> {item.description}
+                        <div className="p-4 text-left">
+                          <strong>Puni opis:</strong>
+                          <p className="mt-2">{item.description}</p>
                         </div>
                       </TableCell>
                     </TableRow>
