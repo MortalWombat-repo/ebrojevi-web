@@ -102,7 +102,7 @@ function DatabasePage() {
             placeholder="Pretraži po kodu ili nazivu..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full"
+            className="w-full text-white bg-background placeholder:text-muted-foreground"
           />
         </div>
         <div className="rounded-md border overflow-auto w-full">
