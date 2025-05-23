@@ -136,12 +136,14 @@ function DatabasePage() {
                             : 'text-center'
                         }`}
                       >
-                        {key === 'color' && value === 'Green'
-                          ? 'Smatra se sigurnim'
-                        {key === 'color' && value === 'Yellow'
-                          ? 'Konzumirati u manjoj mjeri'
-                        {key === 'color' && value === 'Red'
-                          ? 'Izbjegavati!'
+                        {key === 'color'
+                          ? (value === 'Green'
+                              ? 'Smatra se sigurnim'
+                              : value === 'Yellow'
+                              ? 'Konzumirati u manjoj mjeri'
+                              : value === 'Red'
+                              ? 'Izbjegavati!'
+                              : value)
                           : key === 'description' && value.length > 250
                           ? `${value.substring(0, 250)}...`
                           : value}
