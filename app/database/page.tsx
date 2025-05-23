@@ -1,4 +1,3 @@
-// app/database/page.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -134,6 +133,8 @@ function DatabasePage() {
                         className={`align-middle ${
                           key === 'name'
                             ? 'whitespace-normal break-words text-center px-2 py-1'
+                            : key === 'description'
+                            ? 'whitespace-nowrap overflow-hidden text-overflow-ellipsis text-center max-w-xs'
                             : 'text-center'
                         }`}
                       >
@@ -154,7 +155,7 @@ function DatabasePage() {
                   {expanded.has(index) && (
                     <TableRow className={getBackgroundColor(item.color || '')}>
                       <TableCell
-                        colSpan={7} // Updated to match the number of columns (6 + index column)
+                        colSpan={7}
                         className="align-middle"
                       >
                         <div className="p-4 text-left">
