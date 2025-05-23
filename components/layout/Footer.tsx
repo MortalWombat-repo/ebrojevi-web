@@ -11,7 +11,7 @@ const Footer = () => {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <img src="/icon.svg" alt="Ebrojevi Icon" className="h-[3rem] w-[3rem]" />
-              <span className="text-lg font-medium text-white">Ebrojevi API</span>
+              <span className="text-lg font-medium text-white">Ebrojevi</span>
             </div>
             <p className="text-sm text-muted-foreground max-w-md">
               Skenirajte vaše deklaracije i saznajte koliko je zdrava hrana koju
