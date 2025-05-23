@@ -44,12 +44,10 @@ function DatabasePage() {
     getAdditives();
   }, []);
 
-  // Display error if fetch fails
   if (error) {
     return <div className="text-red-500 text-center">Error: {error}</div>;
   }
 
-  // Show loading state while data is being fetched
   if (data.length === 0 && !error) {
     return <div className="text-center">Loading...</div>;
   }
@@ -118,50 +116,50 @@ function DatabasePage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-  {filteredData.map((item, index) => (
-    <React.Fragment key={item.code || index}>
-      <TableRow
-        className={`transition-all duration-200 cursor-pointer ${getBackgroundColor(
-          item.color || ''
-        )}`}
-        onClick={() => toggleExpand(index)}
-      >
-        <TableCell className="align-middle text-center">
-          {index + 1}
-        </TableCell>
-        {Object.entries(item).map(([key, value]) => (
-          <TableCell
-            key={key}
-            className={`align-middle ${
-              key === 'name'
-                ? 'whitespace-normal break-words text-center px-2 py-1'
-                : 'text-center'
-            }`}
-          >
-            {key === 'code' && value === 'Red'
-              ? 'Izbjegavati!'
-              : key === 'description' && value.length > 250
-              ? `${value.substring(0, 250)}...`
-              : value}
-          </TableCell>
-        ))}
-      </TableRow>
-      {expanded.has(index) && (
-        <TableRow className={getBackgroundColor(item.color || '')}>
-          <TableCell
-            colSpan={1 + Object.keys(item).length}
-            className="align-middle"
-          >
-            <div className="p-4 text-left">
-              <strong>Puni opis:</strong>
-              <p className="mt-2">{item.description}</p>
-            </div>
-          </TableCell>
-        </TableRow>
-      )}
-    </React.Fragment>
-  ))}
-</TableBody>
+              {filteredData.map((item, index) => (
+                <React.Fragment key={item.code || index}>
+                  <TableRow
+                    className={`transition-all duration-200 cursor-pointer ${getBackgroundColor(
+                      item.color || ''
+                    )}`}
+                    onClick={() => toggleExpand(index)}
+                  >
+                    <TableCell className="align-middle text-center">
+                      {index + 1}
+                    </TableCell>
+                    {Object.entries(item).map(([key, value]) => (
+                      <TableCell
+                        key={key}
+                        className={`align-middle ${
+                          key === 'name'
+                            ? 'whitespace-normal break-words text-center px-2 py-1'
+                            : 'text-center'
+                        }`}
+                      >
+                        {key === 'code' && value === 'Red'
+                          ? 'Izbjegavati!'
+                          : key === 'description' && value.length > 250
+                          ? `${value.substring(0, 250)}...`
+                          : value}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  {expanded.has(index) && (
+                    <TableRow className={getBackgroundColor(item.color || '')}>
+                      <TableCell
+                        colSpan={1 + Object.keys(item).length}
+                        className="align-middle"
+                      >
+                        <div className="p-4 text-left">
+                          <strong>Puni opis:</strong>
+                          <p className="mt-2">{item.description}</p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
+              ))}
+            </TableBody>
           </Table>
         </div>
       </div>
