@@ -10,7 +10,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <Code className="h-5 w-5 text-blue-500" />
+              <img src="/icon.svg" alt="Ebrojevi Icon" className="h-[3rem] w-[3rem]" />
               <span className="text-lg font-medium text-white">Ebrojevi API</span>
             </div>
             <p className="text-sm text-muted-foreground max-w-md">
