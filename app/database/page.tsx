@@ -108,12 +108,12 @@ function DatabasePage() {
             <TableHeader>
               <TableRow>
                 <TableHead className="text-center">#</TableHead>
-                <TableHead className="text-center">CODE/KOD</TableHead>
-                <TableHead className="text-center">NAME/IME</TableHead>
-                <TableHead className="text-center">DESCRIPTION/OPIS</TableHead>
-                <TableHead className="text-center">TYPE/TIP</TableHead>
-                <TableHead className="text-center">ADI/PDU</TableHead>
-                <TableHead className="text-center">COLOR/SIGURNOST</TableHead>
+                <TableHead className="text-center">KOD/CODE</TableHead>
+                <TableHead className="text-center">NAZIV/NAME</TableHead>
+                <TableHead className="text-center">OPIS/DESCRIPTION</TableHead>
+                <TableHead className="text-center">TIP/TYPE</TableHead>
+                <TableHead className="text-center">PDU/ADI</TableHead>
+                <TableHead className="text-center">SIGURNOST/COLOR</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
