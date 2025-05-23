@@ -108,11 +108,12 @@ function DatabasePage() {
             <TableHeader>
               <TableRow>
                 <TableHead className="text-center">#</TableHead>
-                {Object.keys(data[0]).map((key) => (
-                  <TableHead key={key} className="text-center">
-                    {key.toUpperCase()}
-                  </TableHead>
-                ))}
+                <TableHead className="text-center">CODE/KOD</TableHead>
+                <TableHead className="text-center">NAME/IME</TableHead>
+                <TableHead className="text-center">DESCRIPTION/OPIS</TableHead>
+                <TableHead className="text-center">TYPE/TIP</TableHead>
+                <TableHead className="text-center">ADI/PDU</TableHead>
+                <TableHead className="text-center">COLOR/SIGURNOST</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -127,7 +128,7 @@ function DatabasePage() {
                     <TableCell className="align-middle text-center">
                       {index + 1}
                     </TableCell>
-                    {Object.entries(item).map(([key, value]) => (
+                    {['code', 'name', 'description', 'type', 'adi', 'color'].map((key) => (
                       <TableCell
                         key={key}
                         className={`align-middle ${
@@ -137,23 +138,23 @@ function DatabasePage() {
                         }`}
                       >
                         {key === 'color'
-                          ? (value === 'Green'
+                          ? (item[key] === 'Green'
                               ? 'Smatra se sigurnim'
-                              : value === 'Yellow'
+                              : item[key] === 'Yellow'
                               ? 'Konzumirati u manjoj mjeri'
-                              : value === 'Red'
+                              : item[key] === 'Red'
                               ? 'Izbjegavati!'
-                              : value)
-                          : key === 'description' && value.length > 250
-                          ? `${value.substring(0, 250)}...`
-                          : value}
+                              : item[key])
+                          : key === 'description' && item[key].length > 250
+                          ? `${item[key].substring(0, 250)}...`
+                          : item[key]}
                       </TableCell>
                     ))}
                   </TableRow>
                   {expanded.has(index) && (
                     <TableRow className={getBackgroundColor(item.color || '')}>
                       <TableCell
-                        colSpan={1 + Object.keys(item).length}
+                        colSpan={7} // Updated to match the number of columns (6 + index column)
                         className="align-middle"
                       >
                         <div className="p-4 text-left">
