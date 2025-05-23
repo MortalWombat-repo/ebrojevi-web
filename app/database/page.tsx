@@ -1,3 +1,4 @@
+// app/database/page.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -124,14 +125,16 @@ function DatabasePage() {
                     )}`}
                     onClick={() => toggleExpand(index)}
                   >
-                    <TableCell className="align-middle text-center whitespace-nowrap">
+                    <TableCell className="align-middle text-center">
                       {index + 1}
                     </TableCell>
                     {['code', 'name', 'description', 'type', 'adi', 'color'].map((key) => (
                       <TableCell
                         key={key}
-                        className={`align-middle text-center whitespace-nowrap overflow-hidden text-overflow-ellipsis ${
-                          key === 'description' ? 'max-w-xs' : ''
+                        className={`align-middle ${
+                          key === 'name'
+                            ? 'whitespace-normal break-words text-center px-2 py-1'
+                            : 'text-center'
                         }`}
                       >
                         {key === 'color'
@@ -151,7 +154,7 @@ function DatabasePage() {
                   {expanded.has(index) && (
                     <TableRow className={getBackgroundColor(item.color || '')}>
                       <TableCell
-                        colSpan={7}
+                        colSpan={7} // Updated to match the number of columns (6 + index column)
                         className="align-middle"
                       >
                         <div className="p-4 text-left">
