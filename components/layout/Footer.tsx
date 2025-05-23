@@ -27,7 +27,7 @@ const Footer = () => {
                   href="/pristup"
                   className="text-sm text-muted-foreground hover:text-white transition-colors"
                 >
-                  Dokumentacija
+                  Baza Ebrojeva
                 </Link>
               </li>
               <li>
@@ -35,7 +35,7 @@ const Footer = () => {
                   href="/api-docs"
                   className="text-sm text-muted-foreground hover:text-white transition-colors"
                 >
-                  API Reference
+                  API Ebrojeva
                 </Link>
               </li>
               <li>
@@ -43,7 +43,7 @@ const Footer = () => {
                   href="/arhive"
                   className="text-sm text-muted-foreground hover:text-white transition-colors"
                 >
-                  Arhive podataka
+                  Vaši Skenovi
                 </Link>
               </li>
             </ul>
