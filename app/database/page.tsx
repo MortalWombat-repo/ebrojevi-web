@@ -136,7 +136,7 @@ function DatabasePage() {
                             : 'text-center'
                         }`}
                       >
-                        {key === 'code' && value === 'Red'
+                        {key === 'color' && value === 'Red'
                           ? 'Izbjegavati!'
                           : key === 'description' && value.length > 250
                           ? `${value.substring(0, 250)}...`
