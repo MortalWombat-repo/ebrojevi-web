@@ -19,44 +19,69 @@ export async function POST(request: Request) {
     // Log formData contents for debugging
     console.log('FormData contains image:', !!image);
 
-    const response = await fetch('http://ocr-instance.eba-rzmiwmm2.eu-central-1.elasticbeanstalk.com/ocr', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'Accept': 'application/json', // Ensure JSON response is expected
-        'User-Agent': 'curl/7.68.0', // Mimic curl's User-Agent
-        // Note: Content-Type is automatically set to multipart/form-data with correct boundary by fetch
-      },
-    });
+    const maxRetries = 3;
+    let attempt = 0;
+    let response;
 
-    // Log response details
-    console.log('OCR response status:', response.status);
-    console.log('OCR response headers:', Object.fromEntries(response.headers));
+    while (attempt < maxRetries) {
+      try {
+        response = await fetch('http://ocr-instance.eba-rzmiwmm2.eu-central-1.elasticbeanstalk.com/ocr', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Accept': 'application/json', // Request JSON response
+            'User-Agent': 'curl/7.68.0', // Mimic curl's User-Agent
+            // Uncomment if OCR service requires authentication
+            // 'Authorization': 'Bearer your-api-key',
+          },
+        });
 
-    // Check if the response is JSON
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      const text = await response.text();
-      console.error('Non-JSON response from OCR service:', text.slice(0, 100));
-      return NextResponse.json(
-        {
-          error: 'Failed to process image',
-          details: `Expected JSON, but received ${contentType || 'no content-type'}: ${text.slice(0, 100)}`,
-        },
-        { status: 500 }
-      );
-    }
+        // Log response details
+        console.log(`Attempt ${attempt + 1} - OCR response status:`, response.status);
+        console.log(`Attempt ${attempt + 1} - OCR response headers:`, Object.fromEntries(response.headers));
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OCR error response:', errorData);
-      return NextResponse.json(
-        {
-          error: 'Failed to process image',
-          details: `OCR service failed with status ${response.status}: ${JSON.stringify(errorData)}`,
-        },
-        { status: response.status }
-      );
+        // Check if the response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const text = await response.text();
+          console.error(`Attempt ${attempt + 1} - Non-JSON response from OCR service:`, text.slice(0, 500));
+          return NextResponse.json(
+            {
+              error: 'Failed to process image',
+              details: `Expected JSON, but received ${contentType || 'no content-type'}: ${text.slice(0, 500)}`,
+            },
+            { status: 500 }
+          );
+        }
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error(`Attempt ${attempt + 1} - OCR error response:`, errorData);
+          return NextResponse.json(
+            {
+              error: 'Failed to process image',
+              details: `OCR service failed with status ${response.status}: ${JSON.stringify(errorData)}`,
+            },
+            { status: response.status }
+          );
+        }
+
+        break; // Exit loop on success
+      } catch (error) {
+        attempt++;
+        if (attempt === maxRetries) {
+          console.error('Max retries reached:', error.message);
+          return NextResponse.json(
+            {
+              error: 'Failed to process image',
+              details: `Max retries reached: ${error.message}`,
+            },
+            { status: 500 }
+          );
+        }
+        console.log(`Retrying request (${attempt + 1}/${maxRetries})...`);
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1s
+      }
     }
 
     const data = await response.json();
