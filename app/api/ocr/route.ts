@@ -9,21 +9,27 @@ export async function POST(request: Request) {
 
     // Validate that an image was provided
     if (!image) {
+      console.error('No image file provided in formData');
       return NextResponse.json(
         { error: 'No image file provided' },
         { status: 400 }
       );
     }
 
+    // Log the formData contents for debugging
+    console.log('FormData contains image:', !!image);
+
     const response = await fetch('http://ocr-instance.eba-rzmiwmm2.eu-central-1.elasticbeanstalk.com/ocr', {
       method: 'POST',
       body: formData,
+      // Note: Content-Type is automatically set to multipart/form-data with correct boundary by fetch when using FormData
       headers: {
-        // Ensure the Content-Type is set appropriately if required by the OCR service
-        // 'Content-Type': 'multipart/form-data' is automatically set by the browser when using FormData
+        // Explicitly setting Content-Type is not needed, but included for clarity to match curl
+        // 'Content-Type': 'multipart/form-data' is handled by the browser
       },
     });
 
+    // Log response details
     console.log('OCR response status:', response.status);
     console.log('OCR response headers:', response.headers.get('content-type'));
 
@@ -31,14 +37,26 @@ export async function POST(request: Request) {
     const contentType = response.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
       const text = await response.text();
-      console.error('Non-JSON response from OCR service:', text.slice(0, 100)); // Log first 100 chars
-      throw new Error(`Expected JSON, but received ${contentType || 'no content-type'}: ${text.slice(0, 100)}`);
+      console.error('Non-JSON response from OCR service:', text.slice(0, 100));
+      return NextResponse.json(
+        {
+          error: 'Failed to process image',
+          details: `Expected JSON, but received ${contentType || 'no content-type'}: ${text.slice(0, 100)}`,
+        },
+        { status: 500 }
+      );
     }
 
     if (!response.ok) {
       const errorData = await response.json();
       console.error('OCR error response:', errorData);
-      throw new Error(`OCR service failed with status ${response.status}: ${JSON.stringify(errorData)}`);
+      return NextResponse.json(
+        {
+          error: 'Failed to process image',
+          details: `OCR service failed with status ${response.status}: ${JSON.stringify(errorData)}`,
+        },
+        { status: response.status }
+      );
     }
 
     const data = await response.json();
@@ -46,17 +64,19 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('OCR processing error:', error.message);
     return NextResponse.json(
-      { error: 'Failed to process image', details: error.message },
+      {
+        error: 'Failed to process image',
+        details: error.message,
+      },
       { status: 500 }
     );
   }
 }
 
-// Optional: Increase body size limit if large images are expected
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '10mb', // Adjust as needed
+      sizeLimit: '10mb', // Support large images, adjust as needed
     },
   },
 };
