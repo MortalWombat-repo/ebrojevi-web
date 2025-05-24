@@ -16,22 +16,22 @@ export async function POST(request: Request) {
       );
     }
 
-    // Log the formData contents for debugging
+    // Log formData contents for debugging
     console.log('FormData contains image:', !!image);
 
     const response = await fetch('http://ocr-instance.eba-rzmiwmm2.eu-central-1.elasticbeanstalk.com/ocr', {
       method: 'POST',
       body: formData,
-      // Note: Content-Type is automatically set to multipart/form-data with correct boundary by fetch when using FormData
       headers: {
-        // Explicitly setting Content-Type is not needed, but included for clarity to match curl
-        // 'Content-Type': 'multipart/form-data' is handled by the browser
+        'Accept': 'application/json', // Ensure JSON response is expected
+        'User-Agent': 'curl/7.68.0', // Mimic curl's User-Agent
+        // Note: Content-Type is automatically set to multipart/form-data with correct boundary by fetch
       },
     });
 
     // Log response details
     console.log('OCR response status:', response.status);
-    console.log('OCR response headers:', response.headers.get('content-type'));
+    console.log('OCR response headers:', Object.fromEntries(response.headers));
 
     // Check if the response is JSON
     const contentType = response.headers.get('content-type');
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '10mb', // Support large images, adjust as needed
+      sizeLimit: '10mb', // Support large images
     },
   },
 };
