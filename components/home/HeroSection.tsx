@@ -55,7 +55,7 @@ const HeroSection = () => {
     formData.append('image', file);
 
     try {
-      const response = await fetch('http://ocr-instance.eba-rzmiwmm2.eu-central-1.elasticbeanstalk.com/ocr', {
+      const response = await fetch('/api/ocr', {
         method: 'POST',
         body: formData,
       });
@@ -65,6 +65,10 @@ const HeroSection = () => {
       }
 
       const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
       setOcrText(data.text || 'No text detected');
     } catch (err) {
       setError('Failed to process image. Please try again.');
