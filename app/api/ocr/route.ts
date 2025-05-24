@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
     while (attempt < maxRetries) {
       try {
-        response = await fetch('http://ocr-instance.eba-rzmiwmm2.eu-central-1.elasticbeanstalk.com/oc', {
+        response = await fetch('"http://ocr-instance.eba-rzmiwmm2.eu-central-1.elasticbeanstalk.com/ocr"', {
           method: 'POST',
           body: formData,
           headers: {
