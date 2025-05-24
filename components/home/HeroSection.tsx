@@ -1,4 +1,3 @@
-// components/home/HeroSection.tsx
 'use client';
 
 import { useEffect, useRef, useCallback, useState } from 'react';
@@ -6,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAndroid, faApple } from '@fortawesome/free-brands-svg-icons';
-import { faImage } from '@fortawesome/free-solid-svg-icons';
+import { faImage, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { ArrowRight } from 'lucide-react';
 import { useDropzone, FileRejection } from 'react-dropzone';
 
@@ -15,6 +14,8 @@ const HeroSection = () => {
   const gridRef = useRef<HTMLDivElement>(null);
   const [image, setImage] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const [ocrText, setOcrText] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // Mouse move effect for background grid
   useEffect(() => {
@@ -46,7 +47,33 @@ const HeroSection = () => {
     return () => document.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // Dropzone logic
+  const processImage = async (file: File) => {
+    setIsLoading(true);
+    setError('');
+    
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await fetch('http://ocr-instance.eba-rzmiwmm2.eu-central-1.elasticbeanstalk.com/ocr', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to process image');
+      }
+
+      const data = await response.json();
+      setOcrText(data.text || 'No text detected');
+    } catch (err) {
+      setError('Failed to process image. Please try again.');
+      console.error('Error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const onDrop = useCallback(
     (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       setError('');
@@ -58,10 +85,20 @@ const HeroSection = () => {
       if (file) {
         const imageUrl = URL.createObjectURL(file);
         setImage(imageUrl);
+        processImage(file);
       }
     },
     []
   );
+
+  const clearImage = () => {
+    if (image) {
+      URL.revokeObjectURL(image);
+    }
+    setImage(null);
+    setOcrText('');
+    setError('');
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -72,7 +109,6 @@ const HeroSection = () => {
     maxFiles: 1,
   });
 
-  // Clean up image URL to prevent memory leaks
   useEffect(() => {
     return () => {
       if (image) URL.revokeObjectURL(image);
@@ -154,7 +190,7 @@ const HeroSection = () => {
           >
             <div
               {...getRootProps()}
-              className={`border-2 border-dashed border-primary/20 rounded-lg p-6 text-center cursor-pointer transition-colors ${
+              className={`relative border-2 border-dashed border-primary/20 rounded-lg p-6 text-center cursor-pointer transition-colors ${
                 isDragActive ? 'bg-primary/10' : 'hover:bg-primary/10'
               } w-full h-32 flex flex-col items-center justify-center`}
             >
@@ -176,12 +212,34 @@ const HeroSection = () => {
             </div>
             {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
             {image && (
-              <div className="mt-4">
+              <div className="mt-4 relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute -right-2 -top-2 bg-background/80 hover:bg-background rounded-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    clearImage();
+                  }}
+                >
+                  <FontAwesomeIcon icon={faXmark} className="h-4 w-4" />
+                </Button>
                 <img
                   src={image}
                   alt="Uploaded preview"
                   className="max-w-full h-auto rounded-lg shadow-md"
                 />
+              </div>
+            )}
+            {isLoading && (
+              <div className="mt-4 text-primary">Processing image...</div>
+            )}
+            {ocrText && !isLoading && (
+              <div className="mt-4 p-4 bg-card/50 backdrop-blur-sm rounded-lg border border-border/50">
+                <h3 className="text-lg font-semibold mb-2">Extracted Text:</h3>
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                  {ocrText}
+                </p>
               </div>
             )}
           </motion.div>
