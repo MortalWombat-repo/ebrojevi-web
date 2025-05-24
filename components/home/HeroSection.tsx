@@ -72,8 +72,8 @@ const processImage = async (file: File) => {
 
     setOcrText(data.text || 'No text detected');
   } catch (err) {
-    setError(err.message); // Display the specific error message
-    console.error('Error:', err);
+    setError(err.message); // Display specific error from API
+    console.error('Client-side error:', err);
   } finally {
     setIsLoading(false);
   }
