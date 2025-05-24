@@ -46,37 +46,38 @@ const HeroSection = () => {
     return () => document.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const processImage = async (file: File) => {
-    setIsLoading(true);
-    setError('');
-    setOcrText('');
-    
-    const formData = new FormData();
-    formData.append('image', file);
+const processImage = async (file: File) => {
+  setIsLoading(true);
+  setError('');
+  setOcrText('');
 
-    try {
-      const response = await fetch('/api/ocr', {
-        method: 'POST',
-        body: formData,
-      });
+  const formData = new FormData();
+  formData.append('image', file);
 
-      if (!response.ok) {
-        throw new Error('Failed to process image');
-      }
+  try {
+    const response = await fetch('/api/ocr', {
+      method: 'POST',
+      body: formData,
+    });
 
-      const data = await response.json();
-      if (data.error) {
-        throw new Error(data.error);
-      }
-      
-      setOcrText(data.text || 'No text detected');
-    } catch (err) {
-      setError('Failed to process image. Please try again.');
-      console.error('Error:', err);
-    } finally {
-      setIsLoading(false);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.details || errorData.error || 'Failed to process image');
     }
-  };
+
+    const data = await response.json();
+    if (data.error) {
+      throw new Error(data.details || data.error);
+    }
+
+    setOcrText(data.text || 'No text detected');
+  } catch (err) {
+    setError(err.message); // Display the specific error message
+    console.error('Error:', err);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const onDrop = useCallback(
     (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
