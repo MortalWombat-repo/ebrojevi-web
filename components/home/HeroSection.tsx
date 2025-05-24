@@ -17,7 +17,6 @@ const HeroSection = () => {
   const [ocrText, setOcrText] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Mouse move effect for background grid
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!containerRef.current || !gridRef.current) return;
@@ -50,6 +49,7 @@ const HeroSection = () => {
   const processImage = async (file: File) => {
     setIsLoading(true);
     setError('');
+    setOcrText('');
     
     const formData = new FormData();
     formData.append('image', file);
@@ -124,7 +124,6 @@ const HeroSection = () => {
       ref={containerRef}
       className="relative h-full flex items-center justify-center px-6 md:px-8 overflow-hidden"
     >
-      {/* Animated dot grid background */}
       <div className="absolute inset-0 z-0">
         <div
           ref={gridRef}
@@ -185,7 +184,6 @@ const HeroSection = () => {
             iOS Aplikacija
           </Button>
 
-          {/* Image Dropzone */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -240,8 +238,8 @@ const HeroSection = () => {
             )}
             {ocrText && !isLoading && (
               <div className="mt-4 p-4 bg-card/50 backdrop-blur-sm rounded-lg border border-border/50">
-                <h3 className="text-lg font-semibold mb-2">Extracted Text:</h3>
-                <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                <h3 className="text-lg font-semibold mb-2 text-white">Extracted Text:</h3>
+                <p className="text-sm text-white whitespace-pre-wrap">
                   {ocrText}
                 </p>
               </div>
