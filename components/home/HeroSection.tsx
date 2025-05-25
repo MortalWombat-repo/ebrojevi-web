@@ -10,14 +10,15 @@ import { ArrowRight } from 'lucide-react';
 import { useDropzone, FileRejection } from 'react-dropzone';
 import ReactCrop, { type Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+import { useRouter } from 'next/navigation';
 
 const HeroSection = () => {
+  const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const [image, setImage] = useState<string | null>(null);
   const [originalFile, setOriginalFile] = useState<File | null>(null);
   const [error, setError] = useState('');
-  const [ocrText, setOcrText] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [isCropping, setIsCropping] = useState(false);
   const [crop, setCrop] = useState<Crop>();
@@ -93,7 +94,6 @@ const HeroSection = () => {
   const processImage = async (file: File) => {
     setIsLoading(true);
     setError('');
-    setOcrText('');
 
     const formData = new FormData();
     formData.append('image', file);
@@ -114,7 +114,8 @@ const HeroSection = () => {
         throw new Error(data.details || data.error);
       }
 
-      setOcrText(data.text || 'No text detected');
+      // Navigate to results page with the OCR text
+      router.push(`/results?text=${encodeURIComponent(data.text || 'No text detected')}`);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);
@@ -167,7 +168,6 @@ const HeroSection = () => {
     }
     setImage(null);
     setOriginalFile(null);
-    setOcrText('');
     setError('');
     setIsCropping(false);
     setCrop(undefined);
@@ -257,7 +257,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="w-full max-w-md mx-auto pt-4"
+            className="w-full max-w-md pt-4"
           >
             <div
               {...getRootProps()}
@@ -349,16 +349,6 @@ const HeroSection = () => {
             )}
             {isLoading && (
               <div className="mt-4 text-primary">Processing image...</div>
-            )}
-            {ocrText && !isLoading && (
-              <div className="mt-4 p-4 bg-card/50 backdrop-blur-sm rounded-lg border border-border/50">
-                <h3 className="text-lg font-semibold mb-2 text-white">
-                  Extracted Text:
-                </h3>
-                <p className="text-sm text-white whitespace-pre-wrap">
-                  {ocrText}
-                </p>
-              </div>
             )}
           </motion.div>
         </motion.div>
