@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
     while (attempt < maxRetries) {
       try {
-        response = await fetch('"http://ocr-instance.eba-rzmiwmm2.eu-central-1.elasticbeanstalk.com/ocr"', {
+        response = await fetch('http://ocr-instance.eba-rzmiwmm2.eu-central-1.elasticbeanstalk.com/ocr', {
           method: 'POST',
           body: formData,
           headers: {
@@ -97,11 +97,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb', // Support large images
-    },
-  },
-};
