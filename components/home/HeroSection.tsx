@@ -115,8 +115,9 @@ const HeroSection = () => {
       }
 
       setOcrText(data.text || 'No text detected');
-    } catch (err) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(errorMessage);
       console.error('Client-side error:', err);
     } finally {
       setIsLoading(false);
@@ -152,9 +153,10 @@ const HeroSection = () => {
       setImage(URL.createObjectURL(croppedBlob));
       setIsCropping(false);
       processImage(croppedFile);
-    } catch (err) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       console.error('Error cropping image:', err);
-      setError('Error cropping image');
+      setError(errorMessage);
     }
   };
 
