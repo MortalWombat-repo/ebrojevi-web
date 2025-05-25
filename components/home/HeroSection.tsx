@@ -5,9 +5,11 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAndroid, faApple } from '@fortawesome/free-brands-svg-icons';
-import { faImage, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faImage, faXmark, faCrop, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { ArrowRight } from 'lucide-react';
 import { useDropzone, FileRejection } from 'react-dropzone';
+import ReactCrop, { type Crop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 
 const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -16,6 +18,9 @@ const HeroSection = () => {
   const [error, setError] = useState('');
   const [ocrText, setOcrText] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isCropping, setIsCropping] = useState(false);
+  const [crop, setCrop] = useState<Crop>();
+  const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -46,38 +51,77 @@ const HeroSection = () => {
     return () => document.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-const processImage = async (file: File) => {
-  setIsLoading(true);
-  setError('');
-  setOcrText('');
+  const getCroppedImg = (image: HTMLImageElement, crop: Crop): Promise<Blob> => {
+    const canvas = document.createElement('canvas');
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+    canvas.width = crop.width;
+    canvas.height = crop.height;
+    const ctx = canvas.getContext('2d');
 
-  const formData = new FormData();
-  formData.append('image', file);
+    if (!ctx) {
+      throw new Error('No 2d context');
+    }
 
-  try {
-    const response = await fetch('/api/ocr', {
-      method: 'POST',
-      body: formData,
+    ctx.drawImage(
+      image,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width,
+      crop.height
+    );
+
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error('Canvas is empty'));
+            return;
+          }
+          resolve(blob);
+        },
+        'image/jpeg',
+        1
+      );
     });
+  };
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.details || errorData.error || 'Failed to process image');
+  const processImage = async (file: File) => {
+    setIsLoading(true);
+    setError('');
+    setOcrText('');
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await fetch('/api/ocr', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.details || errorData.error || 'Failed to process image');
+      }
+
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.details || data.error);
+      }
+
+      setOcrText(data.text || 'No text detected');
+    } catch (err) {
+      setError(err.message);
+      console.error('Client-side error:', err);
+    } finally {
+      setIsLoading(false);
     }
-
-    const data = await response.json();
-    if (data.error) {
-      throw new Error(data.details || data.error);
-    }
-
-    setOcrText(data.text || 'No text detected');
-  } catch (err) {
-    setError(err.message); // Display specific error from API
-    console.error('Client-side error:', err);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   const onDrop = useCallback(
     (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
@@ -90,11 +134,29 @@ const processImage = async (file: File) => {
       if (file) {
         const imageUrl = URL.createObjectURL(file);
         setImage(imageUrl);
-        processImage(file);
+        setCrop(undefined);
+        setIsCropping(true);
       }
     },
     []
   );
+
+  const handleCropComplete = async () => {
+    if (!imgRef.current || !crop) return;
+
+    try {
+      const croppedBlob = await getCroppedImg(imgRef.current, crop);
+      const croppedFile = new File([croppedBlob], 'cropped-image.jpg', {
+        type: 'image/jpeg',
+      });
+      setImage(URL.createObjectURL(croppedBlob));
+      setIsCropping(false);
+      processImage(croppedFile);
+    } catch (err) {
+      console.error('Error cropping image:', err);
+      setError('Error cropping image');
+    }
+  };
 
   const clearImage = () => {
     if (image) {
@@ -103,6 +165,8 @@ const processImage = async (file: File) => {
     setImage(null);
     setOcrText('');
     setError('');
+    setIsCropping(false);
+    setCrop(undefined);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -216,22 +280,69 @@ const processImage = async (file: File) => {
             {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
             {image && (
               <div className="mt-4 relative">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute -right-2 -top-2 bg-background/80 hover:bg-background rounded-full"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    clearImage();
-                  }}
-                >
-                  <FontAwesomeIcon icon={faXmark} className="h-4 w-4" />
-                </Button>
-                <img
-                  src={image}
-                  alt="Uploaded preview"
-                  className="max-w-full h-auto rounded-lg shadow-md"
-                />
+                {!isCropping && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute -right-2 -top-2 bg-background/80 hover:bg-background rounded-full"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        clearImage();
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faXmark} className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-8 -top-2 bg-background/80 hover:bg-background rounded-full"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsCropping(true);
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faCrop} className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
+                {isCropping ? (
+                  <div className="relative">
+                    <ReactCrop
+                      crop={crop}
+                      onChange={(c) => setCrop(c)}
+                      aspect={undefined}
+                    >
+                      <img
+                        ref={imgRef}
+                        src={image}
+                        alt="Upload preview"
+                        className="max-w-full h-auto rounded-lg shadow-md"
+                      />
+                    </ReactCrop>
+                    <div className="mt-4 flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setIsCropping(false);
+                          setCrop(undefined);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button onClick={handleCropComplete}>
+                        <FontAwesomeIcon icon={faCheck} className="mr-2 h-4 w-4" />
+                        Apply Crop
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <img
+                    src={image}
+                    alt="Upload preview"
+                    className="max-w-full h-auto rounded-lg shadow-md"
+                  />
+                )}
               </div>
             )}
             {isLoading && (
@@ -239,7 +350,9 @@ const processImage = async (file: File) => {
             )}
             {ocrText && !isLoading && (
               <div className="mt-4 p-4 bg-card/50 backdrop-blur-sm rounded-lg border border-border/50">
-                <h3 className="text-lg font-semibold mb-2 text-white">Extracted Text:</h3>
+                <h3 className="text-lg font-semibold mb-2 text-white">
+                  Extracted Text:
+                </h3>
                 <p className="text-sm text-white whitespace-pre-wrap">
                   {ocrText}
                 </p>
