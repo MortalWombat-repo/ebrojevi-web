@@ -67,7 +67,7 @@ export async function POST(request: Request) {
         }
 
         break; // Exit loop on success
-      } catch (error) {
+      } catch (error: Error) { // Explicitly type error as Error
         attempt++;
         if (attempt === maxRetries) {
           console.error('Max retries reached:', error.message);
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (error) {
+  } catch (error: Error) { // Explicitly type error as Error
     console.error('OCR processing error:', error.message);
     return NextResponse.json(
       {
