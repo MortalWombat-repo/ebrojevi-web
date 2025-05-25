@@ -67,14 +67,15 @@ export async function POST(request: Request) {
         }
 
         break; // Exit loop on success
-      } catch (error: Error) { // Explicitly type error as Error
+      } catch (error: unknown) { // Use unknown instead of Error
         attempt++;
         if (attempt === maxRetries) {
-          console.error('Max retries reached:', error.message);
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          console.error('Max retries reached:', errorMessage);
           return NextResponse.json(
             {
               error: 'Failed to process image',
-              details: `Max retries reached: ${error.message}`,
+              details: `Max retries reached: ${errorMessage}`,
             },
             { status: 500 }
           );
@@ -86,12 +87,13 @@ export async function POST(request: Request) {
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (error: Error) { // Explicitly type error as Error
-    console.error('OCR processing error:', error.message);
+  } catch (error: unknown) { // Use unknown instead of Error
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('OCR processing error:', errorMessage);
     return NextResponse.json(
       {
         error: 'Failed to process image',
-        details: error.message,
+        details: errorMessage,
       },
       { status: 500 }
     );
