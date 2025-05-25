@@ -15,6 +15,7 @@ const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const [image, setImage] = useState<string | null>(null);
+  const [originalFile, setOriginalFile] = useState<File | null>(null);
   const [error, setError] = useState('');
   const [ocrText, setOcrText] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
@@ -26,8 +27,7 @@ const HeroSection = () => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!containerRef.current || !gridRef.current) return;
 
-      const { left, top, width, height } =
-        containerRef.current.getBoundingClientRect();
+      const { left, top, width, height } = containerRef.current.getBoundingClientRect();
       const mouseX = e.clientX - left;
       const mouseY = e.clientY - top;
 
@@ -133,10 +133,11 @@ const HeroSection = () => {
       }
       const file = acceptedFiles[0];
       if (file) {
+        setOriginalFile(file);
         const imageUrl = URL.createObjectURL(file);
         setImage(imageUrl);
         setCrop(undefined);
-        setIsCropping(true);
+        setIsCropping(false);
       }
     },
     []
@@ -165,6 +166,7 @@ const HeroSection = () => {
       URL.revokeObjectURL(image);
     }
     setImage(null);
+    setOriginalFile(null);
     setOcrText('');
     setError('');
     setIsCropping(false);
@@ -281,33 +283,7 @@ const HeroSection = () => {
             </div>
             {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
             {image && (
-              <div className="mt-4 relative">
-                {!isCropping && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute -right-2 -top-2 bg-background/80 hover:bg-background rounded-full"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        clearImage();
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faXmark} className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-8 -top-2 bg-background/80 hover:bg-background rounded-full"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsCropping(true);
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faCrop} className="h-4 w-4" />
-                    </Button>
-                  </>
-                )}
+              <div className="mt-4">
                 {isCropping ? (
                   <div className="relative">
                     <ReactCrop
@@ -329,21 +305,45 @@ const HeroSection = () => {
                           setIsCropping(false);
                           setCrop(undefined);
                         }}
+                        disabled={isLoading}
                       >
                         Cancel
                       </Button>
-                      <Button onClick={handleCropComplete}>
+                      <Button onClick={handleCropComplete} disabled={isLoading}>
                         <FontAwesomeIcon icon={faCheck} className="mr-2 h-4 w-4" />
                         Apply Crop
                       </Button>
                     </div>
                   </div>
                 ) : (
-                  <img
-                    src={image}
-                    alt="Upload preview"
-                    className="max-w-full h-auto rounded-lg shadow-md"
-                  />
+                  <div>
+                    <img
+                      src={image}
+                      alt="Upload preview"
+                      className="max-w-full h-auto rounded-lg shadow-md"
+                    />
+                    <div className="mt-4 flex justify-center gap-2">
+                      <Button
+                        onClick={() => setIsCropping(true)}
+                        disabled={isLoading}
+                      >
+                        Crop
+                      </Button>
+                      <Button
+                        onClick={() => originalFile && processImage(originalFile)}
+                        disabled={isLoading}
+                      >
+                        Upload
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={clearImage}
+                        disabled={isLoading}
+                      >
+                        Close
+                      </Button>
+                    </div>
+                  </div>
                 )}
               </div>
             )}
