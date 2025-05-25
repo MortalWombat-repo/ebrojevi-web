@@ -16,85 +16,71 @@ export async function POST(request: Request) {
       );
     }
 
-    // Log formData contents for debugging
     console.log('FormData contains image:', !!image);
 
     const maxRetries = 3;
     let attempt = 0;
-    let response;
 
     while (attempt < maxRetries) {
       try {
-        response = await fetch('http://ocr-instance.eba-rzmiwmm2.eu-central-1.elasticbeanstalk.com/ocr', {
+        const response = await fetch('http://ocr-instance.eba-rzmiwmm2.eu-central-1.elasticbeanstalk.com/ocr', {
           method: 'POST',
           body: formData,
           headers: {
-            'Accept': 'application/json', // Request JSON response
-            'User-Agent': 'curl/7.68.0', // Mimic curl's User-Agent
-            // Uncomment if OCR service requires authentication
-            // 'Authorization': 'Bearer your-api-key',
+            'Accept': 'application/json',
+            'User-Agent': 'curl/7.68.0',
+            // 'Authorization': 'Bearer your-api-key', // Uncomment if needed
           },
         });
 
-        // Log response details
         console.log(`Attempt ${attempt + 1} - OCR response status:`, response.status);
-        console.log(`Attempt ${attempt + 1} - OCR response headers:`, Object.fromEntries(response.headers));
 
-        // Check if the response is JSON
+        // Check if response is JSON
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
           const text = await response.text();
-          console.error(`Attempt ${attempt + 1} - Non-JSON response from OCR service:`, text.slice(0, 500));
-          return NextResponse.json(
-            {
-              error: 'Failed to process image',
-              details: `Expected JSON, but received ${contentType || 'no content-type'}: ${text.slice(0, 500)}`,
-            },
-            { status: 500 }
-          );
+          console.error(`Attempt ${attempt + 1} - Non-JSON response:`, text.slice(0, 500));
+          attempt++;
+          if (attempt < maxRetries) {
+            console.log(`Retrying (${attempt + 1}/${maxRetries})...`);
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1s
+          }
+          continue;
         }
 
-        if (!response.ok) {
+        if (response.ok) {
+          const data = await response.json();
+          return NextResponse.json(data); // Success: return data immediately
+        } else {
           const errorData = await response.json();
-          console.error(`Attempt ${attempt + 1} - OCR error response:`, errorData);
-          return NextResponse.json(
-            {
-              error: 'Failed to process image',
-              details: `OCR service failed with status ${response.status}: ${JSON.stringify(errorData)}`,
-            },
-            { status: response.status }
-          );
+          console.error(`Attempt ${attempt + 1} - OCR error:`, errorData);
+          attempt++;
+          if (attempt < maxRetries) {
+            console.log(`Retrying (${attempt + 1}/${maxRetries})...`);
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1s
+          }
         }
-
-        break; // Exit loop on success
-      } catch (error: unknown) { // Use unknown instead of Error
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`Attempt ${attempt + 1} - Fetch error:`, errorMessage);
         attempt++;
-        if (attempt === maxRetries) {
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-          console.error('Max retries reached:', errorMessage);
-          return NextResponse.json(
-            {
-              error: 'Failed to process image',
-              details: `Max retries reached: ${errorMessage}`,
-            },
-            { status: 500 }
-          );
+        if (attempt < maxRetries) {
+          console.log(`Retrying (${attempt + 1}/${maxRetries})...`);
+          await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1s
         }
-        console.log(`Retrying request (${attempt + 1}/${maxRetries})...`);
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1s
       }
     }
 
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: unknown) { // Use unknown instead of Error
+    // All attempts failed
+    return NextResponse.json(
+      { error: 'Failed to process image', details: 'All attempts failed' },
+      { status: 500 }
+    );
+  } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('OCR processing error:', errorMessage);
     return NextResponse.json(
-      {
-        error: 'Failed to process image',
-        details: errorMessage,
-      },
+      { error: 'Failed to process image', details: errorMessage },
       { status: 500 }
     );
   }
