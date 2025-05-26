@@ -11,6 +11,7 @@ import { useDropzone, FileRejection } from 'react-dropzone';
 import ReactCrop, { type Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const HeroSection = () => {
   const router = useRouter();
@@ -281,6 +282,11 @@ const HeroSection = () => {
                 </p>
               )}
             </div>
+            <div className="mt-2 text-center">
+              <Link href="/manual-input" className="text-primary hover:text-primary/80 text-sm">
+                Deklaracija nečitka ili se svi brojevi nisu skenirali? Upišite ručno OVDJE.
+              </Link>
+            </div>
             {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
             {image && (
               <div className="mt-4">
@@ -355,6 +361,6 @@ const HeroSection = () => {
       </div>
     </section>
   );
-};
+}
 
 export default HeroSection;

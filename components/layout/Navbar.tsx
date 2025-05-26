@@ -73,7 +73,7 @@ const NavLinks = ({
   const links = [
     { name: 'Početna', href: '/' },
     { name: 'Baza Ebrojeva', href: '/database' },
-    { name: 'Vaši Skenovi', href: '/api-docs' },
+    { name: 'Ručni upis', href: '/manual-input' },
   ];
 
   return (
