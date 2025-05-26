@@ -115,7 +115,6 @@ const HeroSection = () => {
         throw new Error(data.details || data.error);
       }
 
-      // Navigate to results page with the OCR text
       router.push(`/results?text=${encodeURIComponent(data.text || 'No text detected')}`);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
@@ -283,7 +282,7 @@ const HeroSection = () => {
               )}
             </div>
             <div className="mt-2 text-center">
-              <Link href="/manual-input" className="text-primary hover:text-primary/80 text-sm">
+              <Link href="/database" className="text-white hover:text-white/80 text-sm">
                 Deklaracija nečitka ili se svi brojevi nisu skenirali? Upišite ručno OVDJE.
               </Link>
             </div>
@@ -333,6 +332,7 @@ const HeroSection = () => {
                         onClick={() => setIsCropping(true)}
                         disabled={isLoading}
                       >
+                        <FontAwesomeIcon icon={faCrop} className="mr-2 h-4 w-4" />
                         Crop
                       </Button>
                       <Button
@@ -346,6 +346,7 @@ const HeroSection = () => {
                         onClick={clearImage}
                         disabled={isLoading}
                       >
+                        <FontAwesomeIcon icon={faXmark} className="mr-2 h-4 w-4" />
                         Close
                       </Button>
                     </div>
@@ -361,6 +362,6 @@ const HeroSection = () => {
       </div>
     </section>
   );
-}
+};
 
 export default HeroSection;

@@ -75,10 +75,10 @@ function DatabasePage() {
   };
 
   const filteredData = data.filter((item) => {
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      item.code?.toLowerCase().includes(searchLower) ||
-      item.name?.toLowerCase().includes(searchLower)
+    const searchTerms = searchTerm.toLowerCase().split(/[,;]\s*/);
+    return searchTerms.some(term => 
+      item.code?.toLowerCase().includes(term) ||
+      item.name?.toLowerCase().includes(term)
     );
   });
 
@@ -91,12 +91,12 @@ function DatabasePage() {
           </h1>
         </div>
         <p className="text-muted-foreground text-center max-w-2xl">
-          Prikaz svih Ebrojeva označenih bojama po štetnosti.
+          Prikaz svih Ebrojeva označenih bojama po štetnosti. Upišite E-brojeve odvojene zarezom ili točka-zarezom za pretragu više brojeva odjednom.
         </p>
         <div className="w-full max-w-md mb-4">
           <Input
             type="text"
-            placeholder="Pretraži po kodu ili nazivu..."
+            placeholder="Pretraži po kodu ili nazivu (npr: E100, E200; E300)"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full text-gray-100"
