@@ -359,8 +359,6 @@ const HeroSection = () => {
               </div>
             )}
 
-mittal
-
             {isLoading && <div className="mt-4 text-primary">Processing image...</div>}
           </motion.div>
         </motion.div>
