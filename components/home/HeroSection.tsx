@@ -236,7 +236,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mt-[-8px]"
         >
           Skenirajte deklaraciju
         </motion.h1>
@@ -245,7 +245,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto"
+          className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mt-[-8px]"
         >
           Skenirajte vaše deklaracije i saznajte koliko je zdrava hrana koju mislite konzumirati
         </motion.p>
@@ -358,6 +358,8 @@ const HeroSection = () => {
                 )}
               </div>
             )}
+
+mittal
 
             {isLoading && <div className="mt-4 text-primary">Processing image...</div>}
           </motion.div>
