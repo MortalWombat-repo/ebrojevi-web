@@ -126,7 +126,7 @@ const HeroSection = () => {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 400;
+        const MAX_WIDTH = 133;
         const scale = MAX_WIDTH / img.width;
         canvas.width = MAX_WIDTH;
         canvas.height = img.height * scale;
@@ -311,7 +311,7 @@ const HeroSection = () => {
                         ref={imgRef}
                         src={image}
                         alt="Upload preview"
-                        className="max-w-full max-h-96 h-auto rounded-lg shadow-md"
+                        className="block mx-auto max-w-full max-h-96 h-auto rounded-lg shadow-md"
                       />
                     </ReactCrop>
                     <div className="mt-4 flex justify-end gap-2 flex-wrap">
@@ -336,7 +336,7 @@ const HeroSection = () => {
                     <img
                       src={image}
                       alt="Upload preview"
-                      className="max-w-full max-h-96 h-auto rounded-lg shadow-md"
+                      className="block mx-auto max-w-full max-h-96 h-auto rounded-lg shadow-md"
                     />
                     <div className="mt-4 flex justify-center gap-2 flex-wrap">
                       <Button onClick={() => setIsCropping(true)} disabled={isLoading}>
