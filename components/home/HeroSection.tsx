@@ -17,6 +17,8 @@ const HeroSection = () => {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+
   const [image, setImage] = useState<string | null>(null);
   const [originalFile, setOriginalFile] = useState<File | null>(null);
   const [error, setError] = useState('');
@@ -61,9 +63,7 @@ const HeroSection = () => {
     canvas.height = crop.height;
     const ctx = canvas.getContext('2d');
 
-    if (!ctx) {
-      throw new Error('No 2d context');
-    }
+    if (!ctx) throw new Error('No 2d context');
 
     ctx.drawImage(
       image,
@@ -80,10 +80,7 @@ const HeroSection = () => {
     return new Promise((resolve, reject) => {
       canvas.toBlob(
         (blob) => {
-          if (!blob) {
-            reject(new Error('Canvas is empty'));
-            return;
-          }
+          if (!blob) return reject(new Error('Canvas is empty'));
           resolve(blob);
         },
         'image/jpeg',
@@ -95,7 +92,6 @@ const HeroSection = () => {
   const processImage = async (file: File) => {
     setIsLoading(true);
     setError('');
-
     const formData = new FormData();
     formData.append('image', file);
 
@@ -111,15 +107,12 @@ const HeroSection = () => {
       }
 
       const data = await response.json();
-      if (data.error) {
-        throw new Error(data.details || data.error);
-      }
+      if (data.error) throw new Error(data.details || data.error);
 
       router.push(`/results?text=${encodeURIComponent(data.text || 'No text detected')}`);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);
-      console.error('Client-side error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -130,16 +123,13 @@ const HeroSection = () => {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 400; // Maximum width for thumbnail
+        const MAX_WIDTH = 400;
         const scale = MAX_WIDTH / img.width;
         canvas.width = MAX_WIDTH;
         canvas.height = img.height * scale;
 
         const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          reject(new Error('Could not get canvas context'));
-          return;
-        }
+        if (!ctx) return reject(new Error('Could not get canvas context'));
 
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         resolve(canvas.toDataURL('image/jpeg'));
@@ -164,9 +154,9 @@ const HeroSection = () => {
           setImage(thumbnailUrl);
           setCrop(undefined);
           setIsCropping(false);
+          setTimeout(() => previewRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
         } catch (err) {
           setError('Failed to create image preview');
-          console.error('Error creating thumbnail:', err);
         }
       }
     },
@@ -178,9 +168,7 @@ const HeroSection = () => {
 
     try {
       const croppedBlob = await getCroppedImg(imgRef.current, crop);
-      const croppedFile = new File([croppedBlob], 'cropped-image.jpg', {
-        type: 'image/jpeg',
-      });
+      const croppedFile = new File([croppedBlob], 'cropped-image.jpg', { type: 'image/jpeg' });
       const thumbnailUrl = await createThumbnail(croppedFile);
       setImage(thumbnailUrl);
       setOriginalFile(croppedFile);
@@ -188,15 +176,12 @@ const HeroSection = () => {
       processImage(croppedFile);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-      console.error('Error cropping image:', err);
       setError(errorMessage);
     }
   };
 
   const clearImage = () => {
-    if (image) {
-      URL.revokeObjectURL(image);
-    }
+    if (image) URL.revokeObjectURL(image);
     setImage(null);
     setOriginalFile(null);
     setError('');
@@ -222,7 +207,7 @@ const HeroSection = () => {
   return (
     <section
       ref={containerRef}
-      className="relative h-full flex items-center justify-center px-6 md:px-8 overflow-hidden"
+      className="relative h-full flex items-center justify-center px-4 sm:px-6 md:px-8 overflow-hidden"
     >
       <div className="absolute inset-0 z-0">
         <div
@@ -239,12 +224,12 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-[#1a2332]/50 to-[#141c28]/50 backdrop-blur-[1px]" />
       </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto text-center space-y-8">
+      <div className="relative z-10 max-w-5xl mx-auto text-center space-y-8 w-full">
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight"
         >
           Skenirajte deklaraciju
         </motion.h1>
@@ -253,10 +238,9 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto"
+          className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto"
         >
-          Skenirajte vaše deklaracije i saznajte koliko je zdrava hrana koju
-          mislite konzumirati
+          Skenirajte vaše deklaracije i saznajte koliko je zdrava hrana koju mislite konzumirati
         </motion.p>
 
         <motion.div
@@ -297,20 +281,12 @@ const HeroSection = () => {
               } w-full h-32 flex flex-col items-center justify-center`}
             >
               <input {...getInputProps()} />
-              <FontAwesomeIcon
-                icon={faImage}
-                className="h-8 w-8 text-primary/50 mb-2"
-              />
-              {isDragActive ? (
-                <p className="text-muted-foreground text-sm">
-                  Drop the image here...
-                </p>
-              ) : (
-                <p className="text-muted-foreground text-sm">
-                  Povucite i ispustite sliku ovdje ili kliknite za odabir iz
-                  preglednika datoteka
-                </p>
-              )}
+              <FontAwesomeIcon icon={faImage} className="h-8 w-8 text-primary/50 mb-2" />
+              <p className="text-muted-foreground text-sm">
+                {isDragActive
+                  ? 'Drop the image here...'
+                  : 'Povucite i ispustite sliku ovdje ili kliknite za odabir iz preglednika datoteka'}
+              </p>
             </div>
             <div className="mt-2 text-center">
               <Link href="/database" className="text-white hover:text-white/80 text-sm">
@@ -318,23 +294,20 @@ const HeroSection = () => {
               </Link>
             </div>
             {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
+
             {image && (
-              <div className="mt-4">
+              <div ref={previewRef} className="mt-4 max-h-[500px] overflow-auto">
                 {isCropping ? (
                   <div className="relative">
-                    <ReactCrop
-                      crop={crop}
-                      onChange={(c) => setCrop(c)}
-                      aspect={undefined}
-                    >
+                    <ReactCrop crop={crop} onChange={(c) => setCrop(c)} aspect={undefined}>
                       <img
                         ref={imgRef}
                         src={image}
                         alt="Upload preview"
-                        className="max-w-full h-auto rounded-lg shadow-md"
+                        className="max-w-full max-h-96 h-auto rounded-lg shadow-md"
                       />
                     </ReactCrop>
-                    <div className="mt-4 flex justify-end gap-2">
+                    <div className="mt-4 flex justify-end gap-2 flex-wrap">
                       <Button
                         variant="outline"
                         onClick={() => {
@@ -356,13 +329,10 @@ const HeroSection = () => {
                     <img
                       src={image}
                       alt="Upload preview"
-                      className="max-w-full h-auto rounded-lg shadow-md"
+                      className="max-w-full max-h-96 h-auto rounded-lg shadow-md"
                     />
-                    <div className="mt-4 flex justify-center gap-2">
-                      <Button
-                        onClick={() => setIsCropping(true)}
-                        disabled={isLoading}
-                      >
+                    <div className="mt-4 flex justify-center gap-2 flex-wrap">
+                      <Button onClick={() => setIsCropping(true)} disabled={isLoading}>
                         <FontAwesomeIcon icon={faCrop} className="mr-2 h-4 w-4" />
                         Crop
                       </Button>
@@ -372,11 +342,7 @@ const HeroSection = () => {
                       >
                         Upload
                       </Button>
-                      <Button
-                        variant="outline"
-                        onClick={clearImage}
-                        disabled={isLoading}
-                      >
+                      <Button variant="outline" onClick={clearImage} disabled={isLoading}>
                         <FontAwesomeIcon icon={faXmark} className="mr-2 h-4 w-4" />
                         Close
                       </Button>
@@ -385,9 +351,8 @@ const HeroSection = () => {
                 )}
               </div>
             )}
-            {isLoading && (
-              <div className="mt-4 text-primary">Processing image...</div>
-            )}
+
+            {isLoading && <div className="mt-4 text-primary">Processing image...</div>}
           </motion.div>
         </motion.div>
       </div>
