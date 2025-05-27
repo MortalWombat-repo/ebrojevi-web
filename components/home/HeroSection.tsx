@@ -237,23 +237,27 @@ const HeroSection = () => {
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto text-center space-y-8 w-full">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mt-[-8px]"
-        >
-          Skenirajte deklaraciju
-        </motion.h1>
+        {!image && (
+          <>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mt-[-8px]"
+            >
+              Skenirajte deklaraciju
+            </motion.h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mt-[-8px]"
-        >
-          Skenirajte vaše deklaracije i saznajte koliko je zdrava hrana koju mislite konzumirati
-        </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mt-[-8px]"
+            >
+              Skenirajte vaše deklaracije i saznajte koliko je zdrava hrana koju mislite konzumirati
+            </motion.p>
+          </>
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -275,17 +279,21 @@ const HeroSection = () => {
             >
               <input {...getInputProps()} />
               <FontAwesomeIcon icon={faImage} className="h-8 w-8 text-primary/50 mb-2" />
-              <p className="text-muted-foreground text-sm">
-                {isDragActive
-                  ? 'Drop the image here...'
-                  : 'Povucite i ispustite sliku ovdje ili kliknite za odabir iz preglednika datoteka'}
-              </p>
+              {!image && (
+                <p className="text-muted-foreground text-sm">
+                  {isDragActive
+                    ? 'Drop the image here...'
+                    : 'Povucite i ispustite sliku ovdje ili kliknite za odabir iz preglednika datoteka'}
+                </p>
+              )}
             </div>
-            <div className="mt-2 text-center">
-              <Link href="/database" className="text-white hover:text-white/80 text-sm">
-                Deklaracija nečitka ili se svi brojevi nisu skenirali? Upišite ručno OVDJE.
-              </Link>
-            </div>
+            {!image && (
+              <div className="mt-2 text-center">
+                <Link href="/database" className="text-white hover:text-white/80 text-sm">
+                  Deklaracija nečitka ili se svi brojevi nisu skenirali? Upišite ručno OVDJE.
+                </Link>
+              </div>
+            )}
             {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
 
             {image && (
