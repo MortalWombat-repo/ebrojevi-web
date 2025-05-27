@@ -125,8 +125,32 @@ const HeroSection = () => {
     }
   };
 
+  const createThumbnail = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 400; // Maximum width for thumbnail
+        const scale = MAX_WIDTH / img.width;
+        canvas.width = MAX_WIDTH;
+        canvas.height = img.height * scale;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Could not get canvas context'));
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg'));
+      };
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   const onDrop = useCallback(
-    (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
+    async (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       setError('');
       if (rejectedFiles.length > 0) {
         setError('Please upload a valid image file (jpg, jpeg, png).');
@@ -134,25 +158,32 @@ const HeroSection = () => {
       }
       const file = acceptedFiles[0];
       if (file) {
-        setOriginalFile(file);
-        const imageUrl = URL.createObjectURL(file);
-        setImage(imageUrl);
-        setCrop(undefined);
-        setIsCropping(false);
+        try {
+          setOriginalFile(file);
+          const thumbnailUrl = await createThumbnail(file);
+          setImage(thumbnailUrl);
+          setCrop(undefined);
+          setIsCropping(false);
+        } catch (err) {
+          setError('Failed to create image preview');
+          console.error('Error creating thumbnail:', err);
+        }
       }
     },
     []
   );
 
   const handleCropComplete = async () => {
-    if (!imgRef.current || !crop) return;
+    if (!imgRef.current || !crop || !originalFile) return;
 
     try {
       const croppedBlob = await getCroppedImg(imgRef.current, crop);
       const croppedFile = new File([croppedBlob], 'cropped-image.jpg', {
         type: 'image/jpeg',
       });
-      setImage(URL.createObjectURL(croppedBlob));
+      const thumbnailUrl = await createThumbnail(croppedFile);
+      setImage(thumbnailUrl);
+      setOriginalFile(croppedFile);
       setIsCropping(false);
       processImage(croppedFile);
     } catch (err: unknown) {
