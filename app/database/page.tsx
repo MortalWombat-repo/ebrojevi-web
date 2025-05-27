@@ -10,16 +10,18 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
+import { useSearchParams } from 'next/navigation';
 
 interface Additive {
   [key: string]: string;
 }
 
 function DatabasePage() {
+  const searchParams = useSearchParams();
   const [data, setData] = useState<Additive[]>([]);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('eNumbers') || '');
 
   useEffect(() => {
     async function getAdditives() {

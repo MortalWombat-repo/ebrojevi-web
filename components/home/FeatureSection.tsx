@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Camera, BookOpen, FlaskConical, BadgeEuro, Download } from 'lucide-react';
+import { Camera, BookOpen, FlaskConical, BadgeEuro } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAndroid, faApple } from '@fortawesome/free-brands-svg-icons';
@@ -37,32 +37,6 @@ const features = [
     description:
       'Uživajte u svim funkcionalnostima aplikacije bez ikakvih troškova.',
   },
-  {
-    icon: <Download className="h-12 w-12 text-blue-500 mx-auto mt-4" />,
-    title: 'Preuzmite aplikaciju',
-    description: (
-      <div className="flex gap-4 justify-center">
-        <Button
-          size="lg"
-          variant="outline"
-          className="w-56 flex items-center justify-center text-muted-foreground/70 border-primary/20 hover:bg-primary/10 hover:text-white"
-        >
-          <FontAwesomeIcon icon={faAndroid} className="mr-2 h-5 w-5" />
-          Android Aplikacija
-          <ArrowRight className="ml-2 h-4 w-4 text-primary" />
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          className="w-56 flex items-center justify-center text-muted-foreground/70 border-primary/20 hover:bg-primary/10 hover:text-white"
-        >
-          <FontAwesomeIcon icon={faApple} className="mr-2 h-5 w-5" />
-          iOS Aplikacija
-          <ArrowRight className="ml-2 h-4 w-4 text-primary" />
-        </Button>
-      </div>
-    ),
-  },
 ];
 
 const container = {
@@ -86,23 +60,51 @@ const FeatureSection = () => {
       {/* Background gradient */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-[500px] bg-blue-900/20 blur-[120px] rounded-full -z-10"></div>
 
-      <motion.div
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, margin: '-100px' }}
-        className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center"
-      >
-        {features.map((feature, index) => (
-          <motion.div key={index} variants={item} className="w-full max-w-xs">
-            <FeatureCard
-              icon={feature.icon}
-              title={feature.title}
-              description={feature.description}
-            />
-          </motion.div>
-        ))}
-      </motion.div>
+      <div className="max-w-7xl mx-auto flex flex-col items-center">
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-100px' }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center"
+        >
+          {features.map((feature, index) => (
+            <motion.div key={index} variants={item} className="w-full max-w-xs">
+              <FeatureCard
+                icon={feature.icon}
+                title={feature.title}
+                description={feature.description}
+              />
+            </motion.div>
+          ))}
+        </motion.div>
+        <motion.div
+          variants={item}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-100px' }}
+          className="flex flex-col items-center gap-4 pt-8"
+        >
+          <Button
+            size="lg"
+            variant="outline"
+            className="w-56 flex items-center justify-center text-muted-foreground/70 border-primary/20 hover:bg-primary/10 hover:text-white"
+          >
+            <FontAwesomeIcon icon={faAndroid} className="mr-2 h-5 w-5" />
+            Android Aplikacija
+            <ArrowRight className="ml-2 h-4 w-4 text-primary" />
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            className="w-56 flex items-center justify-center text-muted-foreground/70 border-primary/20 hover:bg-primary/10 hover:text-white"
+          >
+            <FontAwesomeIcon icon={faApple} className="mr-2 h-5 w-5" />
+            iOS Aplikacija
+            <ArrowRight className="ml-2 h-4 w-4 text-primary" />
+          </Button>
+        </motion.div>
+      </div>
     </section>
   );
 };
@@ -110,7 +112,7 @@ const FeatureSection = () => {
 interface FeatureCardProps {
   icon: React.ReactNode;
   title: string;
-  description: string | React.ReactNode;
+  description: string;
 }
 
 const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {

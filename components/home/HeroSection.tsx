@@ -90,6 +90,12 @@ const HeroSection = () => {
     });
   };
 
+  const extractENumbers = (text: string): string => {
+    const regex = /\bE(?:(?:\d{4})|(?:\d{3}[a-z])|(?:\d{3}))\b/g;
+    const matches = text.match(regex);
+    return matches ? matches.join(', ') : '';
+  };
+
   const processImage = async (file: File) => {
     setIsLoading(true);
     setError('');
@@ -110,7 +116,8 @@ const HeroSection = () => {
       const data = await response.json();
       if (data.error) throw new Error(data.details || data.error);
 
-      router.push(`/results?text=${encodeURIComponent(data.text || 'No text detected')}`);
+      const eNumbers = extractENumbers(data.text || '');
+      router.push(`/database${eNumbers ? `?eNumbers=${encodeURIComponent(eNumbers)}` : ''}`);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);
@@ -151,7 +158,7 @@ const HeroSection = () => {
       if (file) {
         try {
           setOriginalFile(file);
-          setShowGrid(false); // Hide grid
+          setShowGrid(false);
           const thumbnailUrl = await createThumbnail(file);
           setImage(thumbnailUrl);
           setCrop(undefined);
@@ -189,7 +196,7 @@ const HeroSection = () => {
     setError('');
     setIsCropping(false);
     setCrop(undefined);
-    setShowGrid(true); // Show grid
+    setShowGrid(true);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
