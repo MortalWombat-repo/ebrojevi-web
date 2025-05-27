@@ -131,7 +131,7 @@ const HeroSection = () => {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 899; // Increased from 399 to 599 (1.5x larger)
+        const MAX_WIDTH = 899; // Set to 899 pixels
         const scale = MAX_WIDTH / img.width;
         canvas.width = MAX_WIDTH;
         canvas.height = img.height * scale;
@@ -269,10 +269,10 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="w-full max-w-md pt-4"
+            className="w-full max-w-3xl pt-4" // Increased from max-w-md to max-w-3xl
           >
             {image && (
-              <div ref={previewRef} className="mt-4 max-h-[500px] overflow-auto">
+              <div ref={previewRef} className="mt-4 max-h-[600px] overflow-auto"> {/* Increased max-h from 500px */}
                 {isCropping ? (
                   <div className="relative">
                     <ReactCrop crop={crop} onChange={(c) => setCrop(c)} aspect={undefined}>
@@ -280,7 +280,7 @@ const HeroSection = () => {
                         ref={imgRef}
                         src={image}
                         alt="Upload preview"
-                        className="block mx-auto max-w-full max-h-96 h-auto rounded-lg shadow-md"
+                        className="block mx-auto max-h-[600px] h-auto rounded-lg shadow-md" // Removed max-w-full, increased max-h-96 to max-h-[600px]
                       />
                     </ReactCrop>
                     <div className="mt-4 flex justify-end gap-2 flex-wrap">
@@ -305,7 +305,7 @@ const HeroSection = () => {
                     <img
                       src={image}
                       alt="Upload preview"
-                      className="block mx-auto max-w-full max-h-96 h-auto rounded-lg shadow-md"
+                      className="block mx-auto max-h-[600px] h-auto rounded-lg shadow-md" // Removed max-w-full, increased max-h-96 to max-h-[600px]
                     />
                     <div className="mt-4 flex justify-center gap-2 flex-wrap">
                       <Button onClick={() => setIsCropping(true)} disabled={isLoading}>
