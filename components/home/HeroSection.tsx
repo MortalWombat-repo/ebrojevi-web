@@ -25,6 +25,7 @@ const HeroSection = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isCropping, setIsCropping] = useState(false);
   const [crop, setCrop] = useState<Crop>();
+  const [showGrid, setShowGrid] = useState(true);
   const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
@@ -43,12 +44,14 @@ const HeroSection = () => {
       const translateX = (relativeX - 0.5) * 40;
       const translateY = (relativeY - 0.5) * 40;
 
-      gridRef.current.style.transform = `
-        perspective(1000px)
-        rotateX(${rotateX}deg)
-        rotateY(${rotateY}deg)
-        translate(${translateX}px, ${translateY}px)
-      `;
+      if (gridRef.current) {
+        gridRef.current.style.transform = `
+          perspective(1000px)
+          rotateX(${rotateX}deg)
+          rotateY(${rotateY}deg)
+          translate(${translateX}px, ${translateY}px)
+        `;
+      }
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -150,6 +153,7 @@ const HeroSection = () => {
       if (file) {
         try {
           setOriginalFile(file);
+          setShowGrid(false); // Hide grid
           const thumbnailUrl = await createThumbnail(file);
           setImage(thumbnailUrl);
           setCrop(undefined);
@@ -187,6 +191,7 @@ const HeroSection = () => {
     setError('');
     setIsCropping(false);
     setCrop(undefined);
+    setShowGrid(true); // Show grid
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -210,17 +215,19 @@ const HeroSection = () => {
       className="relative h-full flex items-center justify-center px-4 sm:px-6 md:px-8 overflow-hidden"
     >
       <div className="absolute inset-0 z-0">
-        <div
-          ref={gridRef}
-          className="absolute inset-0 transition-transform duration-[50ms] ease-out"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at center, rgba(132, 255, 132, 0.5) 2.5px, transparent 2.5px)',
-            backgroundSize: '40px 40px',
-            backgroundPosition: 'center',
-            transformOrigin: 'center',
-          }}
-        />
+        {showGrid && (
+          <div
+            ref={gridRef}
+            className="absolute inset-0 transition-transform duration-[50ms] ease-out"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle at center, rgba(132, 255, 132, 0.5) 2.5px, transparent 2.5px)',
+              backgroundSize: '40px 40px',
+              backgroundPosition: 'center',
+              transformOrigin: 'center',
+            }}
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-[#1a2332]/50 to-[#141c28]/50 backdrop-blur-[1px]" />
       </div>
 
