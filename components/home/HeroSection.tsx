@@ -271,31 +271,6 @@ const HeroSection = () => {
             transition={{ duration: 0.5, delay: 0.6 }}
             className="w-full max-w-md pt-4"
           >
-            <div
-              {...getRootProps()}
-              className={`relative border-2 border-dashed border-primary/20 rounded-lg p-6 text-center cursor-pointer transition-colors ${
-                isDragActive ? 'bg-primary/10' : 'hover:bg-primary/10'
-              } w-full h-32 flex flex-col items-center justify-center`}
-            >
-              <input {...getInputProps()} />
-              <FontAwesomeIcon icon={faImage} className="h-8 w-8 text-primary/50 mb-2" />
-              {!image && (
-                <p className="text-muted-foreground text-sm">
-                  {isDragActive
-                    ? 'Drop the image here...'
-                    : 'Povucite i ispustite sliku ovdje ili kliknite za odabir iz preglednika datoteka'}
-                </p>
-              )}
-            </div>
-            {!image && (
-              <div className="mt-2 text-center">
-                <Link href="/database" className="text-white hover:text-white/80 text-sm">
-                  Deklaracija nečitka ili se svi brojevi nisu skenirali? Upišite ručno OVDJE.
-                </Link>
-              </div>
-            )}
-            {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
-
             {image && (
               <div ref={previewRef} className="mt-4 max-h-[500px] overflow-auto">
                 {isCropping ? (
@@ -352,6 +327,33 @@ const HeroSection = () => {
                 )}
               </div>
             )}
+
+            <div
+              {...getRootProps()}
+              className={`relative border-2 border-dashed border-primary/20 rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                isDragActive ? 'bg-primary/10' : 'hover:bg-primary/10'
+              } w-full h-32 flex flex-col items-center justify-center`}
+            >
+              <input {...getInputProps()} />
+              {!image && (
+                <>
+                  <FontAwesomeIcon icon={faImage} className="h-8 w-8 text-primary/50 mb-2" />
+                  <p className="text-muted-foreground text-sm">
+                    {isDragActive
+                      ? 'Drop the image here...'
+                      : 'Povucite i ispustite sliku ovdje ili kliknite za odabir iz preglednika datoteka'}
+                  </p>
+                </>
+              )}
+            </div>
+            {!image && (
+              <div className="mt-2 text-center">
+                <Link href="/database" className="text-white hover:text-white/80 text-sm">
+                  Deklaracija nečitka ili se svi brojevi nisu skenirali? Upišite ručno OVDJE.
+                </Link>
+              </div>
+            )}
+            {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
 
             {isLoading && <div className="mt-4 text-primary">Processing image...</div>}
           </motion.div>
