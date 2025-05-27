@@ -131,7 +131,7 @@ const HeroSection = () => {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 899; // Set to 899 pixels
+        const MAX_WIDTH = 598; // Set to 899 pixels
         const scale = MAX_WIDTH / img.width;
         canvas.width = MAX_WIDTH;
         canvas.height = img.height * scale;
