@@ -4,9 +4,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAndroid, faApple } from '@fortawesome/free-brands-svg-icons';
 import { faImage, faXmark, faCrop, faCheck } from '@fortawesome/free-solid-svg-icons';
-import { ArrowRight } from 'lucide-react';
 import { useDropzone, FileRejection } from 'react-dropzone';
 import ReactCrop, { type Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -256,25 +254,6 @@ const HeroSection = () => {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="flex flex-col items-center justify-center space-y-4 pt-4"
         >
-          <Button
-            size="lg"
-            variant="outline"
-            className="w-56 flex items-center justify-center text-muted-foreground/70 border-primary/20 hover:bg-primary/10 hover:text-white"
-          >
-            <FontAwesomeIcon icon={faAndroid} className="mr-2 h-5 w-5" />
-            Android Aplikacija
-            <ArrowRight className="ml-2 h-4 w-4 text-primary" />
-          </Button>
-
-          <Button
-            size="lg"
-            variant="outline"
-            className="w-56 flex items-center justify-center text-muted-foreground/70 border-primary/20 hover:bg-primary/10 hover:text-white"
-          >
-            <FontAwesomeIcon icon={faApple} className="mr-2 h-5 w-5" />
-            iOS Aplikacija
-          </Button>
-
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
