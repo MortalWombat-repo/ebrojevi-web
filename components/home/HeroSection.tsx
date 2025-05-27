@@ -217,7 +217,7 @@ const HeroSection = () => {
   return (
     <section
       ref={containerRef}
-      className="relative h-full flex items-center justify-center px-4 sm:px-6 md:px-8 overflow-hidden"
+      className="relative h-full flex items-start justify-center px-4 sm:px-6 md:px-8 pt-4 overflow-hidden"
     >
       <div className="absolute inset-0 z-0">
         {showGrid && (
@@ -236,12 +236,12 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-[#1a2332]/50 to-[#141c28]/50 backdrop-blur-[1px]" />
       </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto text-center space-y-8 w-full">
+      <div className="relative z-10 max-w-5xl mx-auto text-center space-y-4 w-full mt-[-16px]">
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mt-[-8px]"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight"
         >
           Skenirajte deklaraciju
         </motion.h1>
@@ -250,7 +250,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mt-[-8px]"
+          className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto"
         >
           Skenirajte vaše deklaracije i saznajte koliko je zdrava hrana koju mislite konzumirati
         </motion.p>
