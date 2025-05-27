@@ -1,5 +1,9 @@
 import { motion } from 'framer-motion';
-import { Camera, BookOpen, FlaskConical, BadgeEuro } from 'lucide-react';
+import { Camera, BookOpen, FlaskConical, BadgeEuro, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAndroid, faApple } from '@fortawesome/free-brands-svg-icons';
+import { ArrowRight } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -32,6 +36,32 @@ const features = [
     title: 'Besplatno korištenje',
     description:
       'Uživajte u svim funkcionalnostima aplikacije bez ikakvih troškova.',
+  },
+  {
+    icon: <Download className="h-12 w-12 text-blue-500 mx-auto mt-4" />,
+    title: 'Preuzmite aplikaciju',
+    description: (
+      <div className="flex gap-4 justify-center">
+        <Button
+          size="lg"
+          variant="outline"
+          className="w-56 flex items-center justify-center text-muted-foreground/70 border-primary/20 hover:bg-primary/10 hover:text-white"
+        >
+          <FontAwesomeIcon icon={faAndroid} className="mr-2 h-5 w-5" />
+          Android Aplikacija
+          <ArrowRight className="ml-2 h-4 w-4 text-primary" />
+        </Button>
+        <Button
+          size="lg"
+          variant="outline"
+          className="w-56 flex items-center justify-center text-muted-foreground/70 border-primary/20 hover:bg-primary/10 hover:text-white"
+        >
+          <FontAwesomeIcon icon={faApple} className="mr-2 h-5 w-5" />
+          iOS Aplikacija
+          <ArrowRight className="ml-2 h-4 w-4 text-primary" />
+        </Button>
+      </div>
+    ),
   },
 ];
 
@@ -80,7 +110,7 @@ const FeatureSection = () => {
 interface FeatureCardProps {
   icon: React.ReactNode;
   title: string;
-  description: string;
+  description: string | React.ReactNode;
 }
 
 const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {
